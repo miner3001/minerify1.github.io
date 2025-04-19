@@ -3,196 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Pagamento - Minerify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="pagamento.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #212121;
-            padding: 10px;
-            color: white;
-            text-align: left;
-        }
-        header h1 {
-            font-size: 24px;
-        }
-        .container {
-            width: 70%;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            font-size: 22px;
-            color: #333;
-        }
-        .plans {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .plan {
-            padding: 20px;
-            background-color: #f8f8f8;
-            border-radius: 8px;
-            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
-            width: 20%;
-            text-align: center;
-        }
-        .plan h3 {
-            font-size: 18px;
-            color: #212121;
-        }
-        .plan p {
-            font-size: 16px;
-            color: #555;
-        }
-        .plan button {
-            background-color: #212121;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .plan button:hover {
-            background-color: #333;
-        }
-        form {
-            margin-top: 30px;
-        }
-        label {
-            font-size: 16px;
-            color: #555;
-        }
-        input[type="text"], input[type="email"], input[type="number"], input[type="cvv"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .payment-methods img {
-            width: 50px;
-            margin: 10px;
-            cursor: pointer;
-        }
-        .summary {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #f8f8f8;
-            border-radius: 5px;
-        }
-        .summary p {
-            font-size: 16px;
-            color: #333;
-        }
-        .terms {
-            font-size: 14px;
-            color: #555;
-            text-align: center;
-        }
-        .terms a {
-            color: #212121;
-        }
-        .submit-btn {
-            background-color: #212121;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .submit-btn:hover {
-            background-color: #333;
-        }
-    </style>
 </head>
+
 <body>
 
-<header>
-    <h1>Minerify - Paga e inizia a ascoltare</h1>
-</header>
+    <header>
+        <h1>Completa il tuo pagamento</h1>
+    </header>
+    <nav class="nav">
+        <a href="../first_page/fortnite.html">Home</a>
+        <a href="../music_page/scopri.html">Scopri</a>
+        <a href="../music_page/playlist.html">La tua libreria</a>
+        <a href="premium.html">Premium</a>
+    </nav>
 
-<nav>
-    <a href="../first_page/fortnite.html">Home</a>
-    <a href="../music_page/scopri.html">Scopri</a>
-    <a href="../music_page/playlist.html">La tua libreria</a>
-    <a href="premium.html">Premium</a>
-</nav>
+    <div class="content">
+        <h2>Inserisci i tuoi dati di pagamento</h2>
+        <p>Completa il pagamento per iniziare a goderti Minerify Premium senza interruzioni.</p>
 
-<div class="container">
-    <h2>Seleziona il tuo piano di abbonamento</h2>
-    <div class="plans">
-        <div class="plan">
-            <h3>Basic</h3>
-            <p>€4,99/mese - Accesso con pubblicità</p>
-            <button>Seleziona</button>
-        </div>
-        <div class="plan">
-            <h3>Premium</h3>
-            <p>€9,99/mese - Senza pubblicità</p>
-            <button>Seleziona</button>
-        </div>
-        <div class="plan">
-            <h3>Family</h3>
-            <p>€14,99/mese - Fino a 6 account</p>
-            <button>Seleziona</button>
-        </div>
-        <div class="plan">
-            <h3>Student</h3>
-            <p>€4,99/mese - Sconto studenti</p>
-            <button>Seleziona</button>
-        </div>
+        <form action="/process-payment" method="POST" class="payment-form">
+            <label for="full-name">Nome completo:</label>
+            <input type="text" id="full-name" name="full-name" placeholder="Mario Rossi" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="mario.rossi@example.com" required>
+
+            <label for="card-number">Numero carta di credito:</label>
+            <input type="text" id="card-number" name="card-number" placeholder="1234 5678 9012 3456" required>
+
+            <label for="expiry-date">Data di scadenza:</label>
+            <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/AA" required>
+
+            <label for="cvv">CVV:</label>
+            <input type="text" id="cvv" name="cvv" placeholder="123" required>
+
+            <button type="submit" class="submit-btn">Completa il pagamento</button>
+        </form>
+
+        <p style="margin-top: 30px; font-size: 1.2em;">Hai cambiato idea? <a href="../music_page/scopri.html"
+                style="color: #1DB954;">Torna alla tua libreria</a></p>
     </div>
 
-    <form action="/payment" method="POST">
-        <h2>Dettagli di pagamento</h2>
-        <label for="full-name">Nome completo:</label>
-        <input type="text" id="full-name" name="full-name" required>
+    <footer class="footer">
+        <p>© 2024 Minerify - Tutti i diritti riservati</p>
+    </footer>
 
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
+    <div class="stars"></div>
 
-        <label for="billing-address">Indirizzo di fatturazione:</label>
-        <input type="text" id="billing-address" name="billing-address" required>
-
-        <label for="card-number">Numero carta di credito:</label>
-        <input type="number" id="card-number" name="card-number" required>
-
-        <label for="expiry-date">Data di scadenza:</label>
-        <input type="text" id="expiry-date" name="expiry-date" placeholder="MM/AA" required>
-
-        <label for="cvv">CVV:</label>
-        <input type="number" id="cvv" name="cvv" required>
-
-        <h3>Metodi di pagamento:</h3>
-        <div class="payment-methods">
-            <img src="img/visa.png" alt="Visa">
-            <img src="img/mastercard.png" alt="MasterCard">
-            <img src="img/paypal.png" alt="PayPal">
-        </div>
-
-        <div class="summary">
-            <p><strong>Totale da pagare:</strong> €9,99</p>
-            <p><strong>Piano selezionato:</strong> Premium</p>
-        </div>
-
-        <div class="terms">
-            <p>Accetto i <a href="terms.html">Termini e condizioni</a> e la <a href="privacy.html">Politica sulla privacy</a>.</p>
-        </div>
-
-        <button type="submit" class="submit-btn">Completa il pagamento</button>
-    </form>
-</div>
-
+    <script src="pagamento.js"></script> <!-- Collegamento al file JavaScript esterno -->
 </body>
+
 </html>
