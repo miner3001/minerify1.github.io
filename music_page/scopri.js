@@ -112,14 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Funzione per riprodurre una canzone
     function playSong(index) {
-        if (index < 0 || index >= currentAlbumSongs.length) {
-            console.error('Indice canzone non valido');
+        if (!currentAlbumSongs || !currentAlbumSongs.length || index < 0 || index >= currentAlbumSongs.length) {
+            console.error('Indice canzone non valido o nessun album selezionato');
             return;
         }
 
         try {
             currentSongIndex = index;
-            const previousSrc = audioPlayer.src;
             audioPlayer.src = currentAlbumSongs[index];
             
             const playPromise = audioPlayer.play();
@@ -135,8 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                     .catch(error => {
                         console.error('Errore riproduzione:', error);
-                        audioPlayer.src = previousSrc;
-                        alert('Impossibile riprodurre questa traccia. Riprova più tardi.');
+                        // Se c'è un errore, prova a passare alla prossima canzone
+                        if (!isLoop && currentSongIndex < currentAlbumSongs.length - 1) {
+                            playSong(currentSongIndex + 1);
+                        }
                     });
             }
         } catch (error) {
@@ -147,17 +148,37 @@ document.addEventListener('DOMContentLoaded', function () {
     // Funzione per passare all'album successivo
     function playNextAlbum() {
         const albumCards = document.querySelectorAll('.album-card');
-        const currentAlbumIndex = Array.from(albumCards).findIndex(album => 
-            album.querySelector('img').src === currentAlbumCoverSrc
-        );
+        let currentAlbumCard = null;
+        
+        // Trova l'album corrente
+        for (let i = 0; i < albumCards.length; i++) {
+            if (albumCards[i].querySelector('img')?.src === currentAlbumCoverSrc) {
+                currentAlbumCard = albumCards[i];
+                break;
+            }
+        }
 
-        const nextAlbumIndex = (currentAlbumIndex + 1) % albumCards.length;
-        const nextAlbum = albumCards[nextAlbumIndex];
-
-        // Simula un click sul pulsante "Ascolta ora" del prossimo album
-        const listenNowButton = nextAlbum.querySelector('.listen-now');
-        if (listenNowButton) {
-            listenNowButton.click();
+        if (currentAlbumCard) {
+            const currentIndex = Array.from(albumCards).indexOf(currentAlbumCard);
+            const nextIndex = (currentIndex + 1) % albumCards.length;
+            const nextAlbum = albumCards[nextIndex];
+            
+            if (nextAlbum) {
+                const listenNowButton = nextAlbum.querySelector('.listen-now');
+                if (listenNowButton) {
+                    // Aggiorna tutti i dati dell'album corrente
+                    currentAlbumSongs = listenNowButton.getAttribute('data-src').split(',');
+                    currentAlbumNames = listenNowButton.getAttribute('data-names').split(',');
+                    currentAlbumCoverSrc = nextAlbum.querySelector('img').src;
+                    currentSongIndex = 0;
+                    
+                    // Riproduci la prima canzone del nuovo album
+                    playSong(0);
+                    
+                    // Salva lo stato per mantenere la coerenza
+                    savePlayerState();
+                }
+            }
         }
     }
 
@@ -286,12 +307,48 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Listener per passare all'album successivo quando finisce l'ultimo brano
-    audioPlayer.addEventListener('ended', function () {
-        if (currentSongIndex < currentAlbumSongs.length - 1) {
-            playSong(currentSongIndex + 1); // Passa alla prossima canzone
+    // Modifica il listener per la fine della canzone
+    audioPlayer.addEventListener('ended', function() {
+        if (isLoop) {
+            playSong(currentSongIndex);
+        } else if (isShuffle) {
+            const nextIndex = Math.floor(Math.random() * currentAlbumSongs.length);
+            playSong(nextIndex);
+        } else if (currentSongIndex < currentAlbumSongs.length - 1) {
+            // Still has songs in current album
+            playSong(currentSongIndex + 1);
         } else {
-            playNextAlbum(); // Passa al prossimo album
+            // Last song in album, find and play next album
+            const albumCards = document.querySelectorAll('.album-card');
+            let currentAlbumCard = null;
+            
+            // Find current album card
+            for (let i = 0; i < albumCards.length; i++) {
+                if (albumCards[i].querySelector('img').src === currentAlbumCoverSrc) {
+                    currentAlbumCard = albumCards[i];
+                    break;
+                }
+            }
+
+            if (currentAlbumCard) {
+                const currentIndex = Array.from(albumCards).indexOf(currentAlbumCard);
+                const nextIndex = (currentIndex + 1) % albumCards.length;
+                const nextAlbum = albumCards[nextIndex];
+                
+                if (nextAlbum) {
+                    const listenNowButton = nextAlbum.querySelector('.listen-now');
+                    if (listenNowButton) {
+                        // Update current album data with next album
+                        currentAlbumSongs = listenNowButton.getAttribute('data-src').split(',');
+                        currentAlbumNames = listenNowButton.getAttribute('data-names').split(',');
+                        currentAlbumCoverSrc = nextAlbum.querySelector('img').src;
+                        currentSongIndex = 0;
+                        
+                        // Play first song of next album immediately
+                        playSong(0);
+                    }
+                }
+            }
         }
     });
 
@@ -321,19 +378,6 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('overlay').addEventListener('click', function (event) {
         if (event.target === this) { // Controlla che il click sia sull'overlay e non sul contenuto
             this.classList.remove('visible');
-        }
-    });
-
-    // Aggiungi questi listener dopo la definizione degli elementi DOM
-    audioPlayer.addEventListener('ended', () => {
-        if (isLoop) {
-            playSong(currentSongIndex);
-        } else if (isShuffle) {
-            const nextIndex = Math.floor(Math.random() * currentAlbumSongs.length);
-            playSong(nextIndex);
-        } else {
-            const nextIndex = (currentSongIndex + 1) % currentAlbumSongs.length;
-            playSong(nextIndex);
         }
     });
 
@@ -537,4 +581,25 @@ function initializeStars() {
     }
 
     moveStars();
+}
+
+function findNextAlbumCard() {
+    const albumCards = document.querySelectorAll('.album-card');
+    let currentAlbumCard = null;
+    
+    // Find current album card
+    for (let i = 0; i < albumCards.length; i++) {
+        if (albumCards[i].querySelector('img')?.src === currentAlbumCoverSrc) {
+            currentAlbumCard = albumCards[i];
+            break;
+        }
+    }
+
+    if (currentAlbumCard) {
+        const currentIndex = Array.from(albumCards).indexOf(currentAlbumCard);
+        const nextIndex = (currentIndex + 1) % albumCards.length;
+        return albumCards[nextIndex];
+    }
+    
+    return null;
 }

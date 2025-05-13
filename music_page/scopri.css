@@ -92,20 +92,20 @@ header h1 {
 
 /* Modifica lo stile delle card */
 .album-card {
-    background-color: rgba(0, 0, 0, 0); /* Completamente trasparente */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     transition: all 0.3s ease;
-    border: 1px solid transparent; /* Bordo trasparente di default */
-    box-shadow: none; /* Rimuove l'ombra iniziale */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .album-card:hover {
     transform: scale(1.05);
-    border-color: rgba(0, 122, 204, 0.8); /* Bordo blu neon all'hover */
+    background-color: rgba(0, 0, 0, 0.3);
+    border-color: rgba(0, 122, 204, 0.8);
     box-shadow: 0 0 20px rgba(0, 122, 204, 0.4),
                 inset 0 0 15px rgba(0, 122, 204, 0.2);
 }
@@ -113,6 +113,11 @@ header h1 {
 .album-card img {
     max-width: 100%;
     border-radius: 5px;
+    transition: transform 0.3s ease;
+}
+
+.album-card:hover img {
+    transform: scale(1.02);
 }
 
 /* Mantieni l'effetto neon sul testo */
@@ -136,25 +141,21 @@ header h1 {
 /* Aggiorna lo stile dei bottoni nelle card */
 .listen-now {
     background-color: rgba(0, 122, 204, 0.2);
-    color: #fff;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: white;
     border: 1px solid rgba(0, 122, 204, 0.3);
     padding: 10px 20px;
-    margin-top: 10px;
     border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
     transition: all 0.3s ease;
-    text-shadow: 0 0 5px #007acc;
+    margin-top: 10px;
 }
 
 .listen-now:hover {
-    background-color: rgba(0, 122, 204, 0.3);
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 122, 204, 0.5);
+    background-color: rgba(0, 122, 204, 0.4);
     border-color: rgba(0, 122, 204, 0.8);
-    text-shadow: 0 0 10px #fff;
+    box-shadow: 0 0 15px rgba(0, 122, 204, 0.5);
 }
 
 .footer {
