@@ -46,10 +46,12 @@ header h1 {
 
 .playlist-container {
     margin: 50px auto;
-    background-color: #1a1a1a; /* Colore di sfondo leggermente più chiaro */
-    padding: 40px; /* Aumentato il padding per più spazio interno */
-    border-radius: 15px; /* Angoli più arrotondati */
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6); /* Ombra più pronunciata */
+    background-color: rgba(26, 26, 26, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
     text-align: center;
     width: 90%; /* Occupa il 90% della larghezza della pagina */
     max-width: 1200px; /* Limita la larghezza massima */
@@ -61,7 +63,8 @@ header h1 {
 .playlist-container h2 {
     font-size: 2em; /* Testo più grande */
     margin-bottom: 30px; /* Più spazio sotto il titolo */
-    color: #1db954; /* Colore verde Spotify */
+    color: #007acc; /* Blu neon */
+    text-shadow: 0 0 5px #007acc, 0 0 10px #007acc;
     text-transform: uppercase; /* Testo tutto maiuscolo */
     letter-spacing: 1px; /* Spaziatura tra le lettere */
 }
@@ -153,34 +156,37 @@ header h1 {
 
 .stars {
     width: 100%;
-    height: 100%;
+    height: 300vh;
     position: fixed;
     top: 0;
     left: 0;
     z-index: -1;
-    background: url('https://www.transparenttextures.com/patterns/stardust.png');
-    animation: moveStars 100s linear infinite;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+    background-size: 500px 500px;
+    animation: moveStars 80s linear infinite;
+    transform: translateZ(0);
+    opacity: 0.8;
 }
 
 .stars:after {
     content: "";
     width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
+    height: 300vh;
+    position: absolute;
+    top: -150vh;
     left: 0;
-    background: url('https://www.transparenttextures.com/patterns/stardust.png');
-    animation: moveStars 150s linear infinite reverse;
-    opacity: 0.5;
-    z-index: -1;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+    background-size: 400px 400px;
+    animation: moveStars 120s linear infinite reverse;
+    opacity: 0.6;
 }
 
 @keyframes moveStars {
-    from {
+    0% {
         transform: translateY(0);
     }
-    to {
-        transform: translateY(-100%);
+    100% {
+        transform: translateY(25%);
     }
 }
 
@@ -188,13 +194,16 @@ header h1 {
     position: fixed;
     bottom: 0;
     width: 100%;
-    background-color: #181818;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .player-info {
@@ -218,15 +227,18 @@ header h1 {
 
 .song-details p {
     margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 #current-song {
     font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 #current-artist {
     font-size: 0.9em;
     color: #b3b3b3;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 .player-controls {
@@ -245,6 +257,7 @@ header h1 {
     cursor: pointer;
     font-size: 1.5em;
     transition: color 0.3s;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 .player-controls button:hover {
@@ -518,7 +531,9 @@ button:hover {
 }
 
 .album-card {
-    background-color: #222; /* Sfondo scuro per le card */
+    background-color: rgba(34, 34, 34, 0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -528,11 +543,12 @@ button:hover {
     min-width: 200px; /* Larghezza minima per le card */
     max-width: 300px; /* Larghezza massima per le card */
     flex-grow: 1; /* Le card si espandono per riempire lo spazio */
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .album-card:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 122, 204, 0.3);
 }
 
 .album-card img {
@@ -544,23 +560,33 @@ button:hover {
 }
 
 .album-card h3 {
-    margin-top: 10px;
-    font-size: 1.2em;
-    color: #1DB954;
+    font-size: 1.5em;
+    color: #007acc; /* Blu neon */
+    text-shadow: 0 0 3px #007acc, 0 0 6px #007acc;
+    transition: color 0.3s, text-shadow 0.3s;
+    user-select: none;
+    cursor: default;
+}
+
+.album-card h3:hover {
+    color: #1e90ff;
+    text-shadow: 0 0 8px #1e90ff, 0 0 16px #1e90ff;
 }
 
 .listen-now, .remove-favorite {
     background-color: #1d41b9;
     color: #fff;
     border: none;
-    padding: 10px 15px;
+    padding: 10px 20px;
     margin-top: 10px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
     font-size: 0.9em;
+    transition: background-color 0.3s, transform 0.2s;
 }
 
 .listen-now:hover, .remove-favorite:hover {
     background-color: #1a3a9e;
+    transform: scale(1.05);
 }

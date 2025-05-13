@@ -47,26 +47,51 @@ document.addEventListener('DOMContentLoaded', function () {
             isPlaying: isPlaying,
             songName: currentSong.textContent,
             albumCover: currentAlbumCover.src,
+            currentAlbumSongs: currentAlbumSongs,
+            currentAlbumNames: currentAlbumNames,
+            currentAlbumCoverSrc: currentAlbumCoverSrc,
+            currentSongIndex: currentSongIndex,
+            volume: audioPlayer.volume,
+            isShuffle: isShuffle,
+            isLoop: isLoop
         };
         localStorage.setItem('playerState', JSON.stringify(playerState));
     }
 
     // Ripristina lo stato del player dal localStorage
     function restorePlayerState() {
-        const savedState = JSON.parse(localStorage.getItem('playerState'));
-        if (savedState) {
-            audioPlayer.src = savedState.src || '';
-            audioPlayer.currentTime = savedState.currentTime || 0;
-            currentSong.textContent = savedState.songName || 'Nessuna canzone in riproduzione';
-            currentAlbumCover.src = savedState.albumCover || '';
-            isPlaying = savedState.isPlaying || false;
-
-            if (isPlaying) {
-                audioPlayer.play();
-                playPauseButton.textContent = '⏸️';
-            } else {
-                playPauseButton.textContent = '▶️';
+        try {
+            const savedState = JSON.parse(localStorage.getItem('playerState'));
+            if (savedState) {
+                audioPlayer.src = savedState.src || '';
+                audioPlayer.currentTime = savedState.currentTime || 0;
+                audioPlayer.volume = savedState.volume || 1;
+                currentSong.textContent = savedState.songName || 'Nessuna canzone in riproduzione';
+                currentAlbumCover.src = savedState.albumCover || '';
+                currentAlbumSongs = savedState.currentAlbumSongs || [];
+                currentAlbumNames = savedState.currentAlbumNames || [];
+                currentAlbumCoverSrc = savedState.currentAlbumCoverSrc || '';
+                currentSongIndex = savedState.currentSongIndex || 0;
+                isShuffle = savedState.isShuffle || false;
+                isLoop = savedState.isLoop || false;
+                
+                if (savedState.isPlaying) {
+                    audioPlayer.play()
+                        .then(() => {
+                            isPlaying = true;
+                            playPauseButton.textContent = '⏸️';
+                        })
+                        .catch(() => {
+                            isPlaying = false;
+                            playPauseButton.textContent = '▶️';
+                        });
+                }
+                
+                updateLikeButton();
+                updateShuffleLoopButtons();
             }
+        } catch (error) {
+            console.error('Errore nel ripristino dello stato:', error);
         }
     }
 
@@ -87,20 +112,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Funzione per riprodurre una canzone
     function playSong(index) {
-        if (index < 0 || index >= currentAlbumSongs.length) return;
+        if (index < 0 || index >= currentAlbumSongs.length) {
+            console.error('Indice canzone non valido');
+            return;
+        }
 
-        currentSongIndex = index;
-        audioPlayer.src = currentAlbumSongs[index];
-        audioPlayer.play().catch(error => {
-            console.error('Errore durante la riproduzione:', error);
-            alert('Impossibile riprodurre la canzone.');
-        });
-
-        currentSong.textContent = currentAlbumNames[index];
-        currentAlbumCover.src = currentAlbumCoverSrc;
-        playPauseButton.textContent = '⏸️';
-        isPlaying = true;
-        updateLikeButton();
+        try {
+            currentSongIndex = index;
+            const previousSrc = audioPlayer.src;
+            audioPlayer.src = currentAlbumSongs[index];
+            
+            const playPromise = audioPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        currentSong.textContent = currentAlbumNames[index];
+                        currentAlbumCover.src = currentAlbumCoverSrc;
+                        playPauseButton.textContent = '⏸️';
+                        isPlaying = true;
+                        updateLikeButton();
+                        savePlayerState();
+                    })
+                    .catch(error => {
+                        console.error('Errore riproduzione:', error);
+                        audioPlayer.src = previousSrc;
+                        alert('Impossibile riprodurre questa traccia. Riprova più tardi.');
+                    });
+            }
+        } catch (error) {
+            console.error('Errore critico:', error);
+        }
     }
 
     // Funzione per passare all'album successivo
@@ -283,6 +324,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Aggiungi questi listener dopo la definizione degli elementi DOM
+    audioPlayer.addEventListener('ended', () => {
+        if (isLoop) {
+            playSong(currentSongIndex);
+        } else if (isShuffle) {
+            const nextIndex = Math.floor(Math.random() * currentAlbumSongs.length);
+            playSong(nextIndex);
+        } else {
+            const nextIndex = (currentSongIndex + 1) % currentAlbumSongs.length;
+            playSong(nextIndex);
+        }
+    });
+
+    audioPlayer.addEventListener('error', (e) => {
+        console.error('Errore audio:', e);
+        currentSong.textContent = 'Errore di riproduzione';
+        playPauseButton.textContent = '▶️';
+        isPlaying = false;
+    });
+
+    window.addEventListener('beforeunload', () => {
+        savePlayerState();
+    });
+
     // Ripristina lo stato all'avvio
     restorePlayerState();
 
@@ -293,4 +358,183 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Aggiorna il cuoricino all'avvio
     updateLikeButton();
+
+    // Inizializza la barra di ricerca
+    initializeSearch();
+
+    // Inizializza le stelle
+    initializeStars();
 });
+
+function initializeSearch() {
+    const searchBar = document.getElementById('search-bar');
+    const searchResults = document.getElementById('search-results');
+    let searchTimeout;
+
+    searchBar.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            if (searchTerm.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            const albums = document.querySelectorAll('.album-card');
+            const results = [];
+
+            // Cerca negli album
+            albums.forEach(album => {
+                const title = album.querySelector('h3').textContent.toLowerCase();
+                const artist = album.dataset.artist.toLowerCase();
+                
+                if (title.includes(searchTerm) || artist.includes(searchTerm)) {
+                    results.push({
+                        type: 'album',
+                        element: album,
+                        title: title,
+                        artist: artist,
+                        cover: album.querySelector('img').src,
+                        year: album.dataset.year
+                    });
+                }
+
+                // Cerca nelle canzoni dell'album
+                const listenNowButton = album.querySelector('.listen-now');
+                if (listenNowButton) {
+                    const songs = listenNowButton.getAttribute('data-names')?.split(',') || [];
+                    songs.forEach((song, index) => {
+                        if (song.toLowerCase().includes(searchTerm)) {
+                            results.push({
+                                type: 'song',
+                                element: album,
+                                title: song,
+                                artist: artist,
+                                cover: album.querySelector('img').src,
+                                albumTitle: title,
+                                songIndex: index
+                            });
+                        }
+                    });
+                }
+            });
+
+            displaySearchResults(results, searchResults);
+        }, 300);
+    });
+}
+
+function displaySearchResults(results, container) {
+    container.innerHTML = '';
+    if (results.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'block';
+    
+    results.forEach(result => {
+        const resultElement = document.createElement('div');
+        resultElement.className = 'search-result';
+        
+        if (result.type === 'album') {
+            resultElement.innerHTML = `
+                <img src="${result.cover}" alt="Album cover" style="width: 50px; height: 50px; object-fit: cover;">
+                <div class="result-info">
+                    <h4>${result.title}</h4>
+                    <p>${result.artist} - ${result.year}</p>
+                    <span class="result-type">Album</span>
+                </div>
+            `;
+        } else {
+            resultElement.innerHTML = `
+                <img src="${result.cover}" alt="Album cover" style="width: 50px; height: 50px; object-fit: cover;">
+                <div class="result-info">
+                    <h4>${result.title}</h4>
+                    <p>${result.artist} - ${result.albumTitle}</p>
+                    <span class="result-type">Canzone</span>
+                </div>
+            `;
+        }
+
+        resultElement.addEventListener('click', () => {
+            const listenNowButton = result.element.querySelector('.listen-now');
+            const searchBar = document.getElementById('search-bar'); // Aggiungi questa riga
+            
+            if (result.type === 'album') {
+                listenNowButton.click();
+            } else {
+                listenNowButton.click();
+                setTimeout(() => {
+                    playSong(result.songIndex);
+                }, 100);
+            }
+            
+            // Resetta il campo di ricerca e nascondi i risultati
+            searchBar.value = '';
+            container.style.display = 'none';
+        });
+
+        container.appendChild(resultElement);
+    });
+}
+
+function initializeStars() {
+    const starsContainer = document.querySelector('.stars');
+    const numberOfStars = 1000;
+    const maxSize = 2;
+
+    starsContainer.innerHTML = '';
+
+    for (let i = 0; i < numberOfStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        
+        // Posizione casuale
+        const x = Math.random() * 100;
+        const y = Math.random() * 300;
+        
+        // Dimensione più piccola per stelle più realistiche
+        const size = 0.3 + Math.random() * maxSize;
+        
+        // Brillio più lento
+        const twinkleDuration = 8 + Math.random() * 12; // 8-20 secondi per brillio
+        
+        star.style.cssText = `
+            left: ${x}%;
+            top: ${y}%;
+            width: ${size}px;
+            height: ${size}px;
+            --twinkle-duration: ${twinkleDuration}s;
+            animation-delay: ${Math.random() * twinkleDuration}s;
+            background: rgba(255, 255, 255, ${0.3 + Math.random() * 0.4}); // Luminosità ridotta
+            box-shadow: 0 0 ${size * 1.5}px rgba(255, 255, 255, 0.6);
+            position: absolute;
+            border-radius: 50%;
+        `;
+        
+        starsContainer.appendChild(star);
+    }
+
+    // Movimento molto più lento
+    let scrollPosition = 0;
+    function moveStars() {
+        scrollPosition += 0.01; // Drasticamente ridotta la velocità base
+        const stars = document.querySelectorAll('.star');
+        
+        stars.forEach((star, index) => {
+            const speed = 0.02 + (index % 5) * 0.005; // Velocità molto ridotta con più variazione
+            const y = parseFloat(star.style.top) + speed;
+            
+            if (y > 300) {
+                star.style.top = '-5%';
+            } else {
+                star.style.top = y + '%';
+            }
+        });
+
+        requestAnimationFrame(moveStars);
+    }
+
+    moveStars();
+}

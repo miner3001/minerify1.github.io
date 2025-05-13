@@ -25,9 +25,8 @@
 
     <div class="search-container">
         <input type="text" id="search-bar" placeholder="Cerca album o canzoni...">
+        <div class="search-results" id="search-results"></div>
     </div>
-
-    <div class="search-results" id="search-results"></div>
 
     <div class="discover-section">
         <h2>Scopri nuova musica</h2>
@@ -54,16 +53,20 @@
             <div class="album-card" data-year="2022" data-artist="Kid Yugi">
                 <img src="../img/theglobe.jpeg" alt="The Globe - Kid Yugi">
                 <h3>The Globe - Kid Yugi</h3>
-                <button class="listen-now" data-src="music/11.mp3,music/12.mp3,music/13.mp3,music/14.mp3,music/15.mp3"
-                    data-names="DEM - Kid Yugi (ft-Artie 5 & Tony Boy), GRAMMELOT - Kid Yugi, Il Ferro di Cechov - Kid Yugi, Il Fimografo - Kid Yugi, Yung 3P 3 - Kid Yugi">Ascolta
-                    ora</button>
+                <button class="listen-now" 
+                    data-src="music/11.mp3,music/12.mp3,music/13.mp3,music/14.mp3,music/15.mp3,music/93.mp3,music/94.mp3,music/95.mp3,music/96.mp3,music/97.mp3,music/98.mp3,music/99.mp3"
+                    data-names="DEM - Kid Yugi (ft. Artie 5ive & Tony Boy), GRAMMELOT - Kid Yugi, Il Ferro di Čechov - Kid Yugi, Il Filmografo - Kid Yugi, Yung 3P 3 - Kid Yugi, Hybris - Kid Yugi, Kabuki - Kid Yugi, No Gimmick - Kid Yugi, Sturm und drang - Kid Yugi, Back n' Forth (ft. Kira) - Kid Yugi, King Lear (ft. Sosa Priority) - Kid Yugi, Paradise Now - Kid Yugi">
+                    Ascolta ora
+                </button>
             </div>
             <div class="album-card" data-year="2018" data-artist="Sfera Ebbasta">
                 <img src="../img/Rockstar.jpg" alt="Rockstar - Sfera Ebbasta">
                 <h3>Rockstar - Sfera Ebbasta</h3>
-                <button class="listen-now" data-src="music/16.mp3,music/17.mp3,music/18.mp3,music/19.mp3,music/20.mp3"
-                    data-names="Ricchi per sempre - Sfera Ebbasta, Sciroppo - Sfera Ebbasta, Tran Tran - Sfera Ebbasta, Brano 19, Serpenti a sonagli - Sfera Ebbasta">Ascolta
-                    ora</button>
+                <button class="listen-now" 
+                    data-src="music/16.mp3,music/17.mp3,music/18.mp3,music/19.mp3,music/20.mp3,music/87.mp3,music/88.mp3,music/89.mp3,music/90.mp3,music/91.mp3,music/92.mp3,music"
+                    data-names="Ricchi x Sempre - Sfera Ebbasta, Sciroppo (ft DrefGold) - Sfera Ebbasta, Tran Tran - Sfera Ebbasta, Bancomat - Sfera Ebbasta, Serpenti a sonagli - Sfera Ebbasta, Uber - Sfera Ebbasta, Leggenda - Sfera Ebbasta, Rockstar - Sfera Ebbasta, 20 Collane - Sfera Ebbasta, Cupido (ft Quavo) - Sfera Ebbasta,XNX - Sfera Ebbasta">
+                    Ascolta ora
+                </button>
             </div>
             <div class="album-card" data-year="2021" data-artist="Baby Gang">
                 <img src="../img/ep2.jpg" alt="Ep2 - Baby Gang">
@@ -127,8 +130,8 @@
             <button id="prev-song">⏮️</button>
             <button id="play-pause">▶️</button>
             <button id="next-song">⏭️</button>
-            <button id="shuffle">🔀</button> <!-- Pulsante per la riproduzione casuale -->
-            <button id="loop">🔁</button> <!-- Pulsante per il loop -->
+            <button id="shuffle">🔀</button> 
+            <button id="loop">🔁</button>
             <span id="current-time">0:00</span>
             <input type="range" id="progress-bar" value="0" max="100">
             <span id="total-duration">0:00</span>
