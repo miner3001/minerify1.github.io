@@ -323,7 +323,7 @@ player-controls {
     appearance: none;
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #2d1db9;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;

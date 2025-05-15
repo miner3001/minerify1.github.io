@@ -177,4 +177,51 @@ document.addEventListener('DOMContentLoaded', function () {
     audioPlayer.addEventListener('timeupdate', savePlayerState);
     audioPlayer.addEventListener('play', savePlayerState);
     audioPlayer.addEventListener('pause', savePlayerState);
+
+    // Funzione per inizializzare la searchbar
+    function initializeSearch() {
+        const searchBar = document.getElementById('search-bar');
+        const searchResults = document.getElementById('search-results');
+
+        searchBar.addEventListener('input', function () {
+            const searchTerm = searchBar.value.toLowerCase();
+            const filteredSongs = likedSongs.filter(song =>
+                song.name.toLowerCase().includes(searchTerm)
+            );
+            displaySearchResults(filteredSongs, searchResults);
+        });
+
+        document.addEventListener('click', function (event) {
+            if (!searchBar.contains(event.target) && !searchResults.contains(event.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+    }
+
+    // Funzione per mostrare i risultati della ricerca
+    function displaySearchResults(results, container) {
+        container.innerHTML = '';
+        if (results.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        results.forEach(song => {
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = song.name;
+            a.addEventListener('click', function (event) {
+                event.preventDefault();
+                const index = likedSongs.indexOf(song);
+                if (index !== -1) {
+                    playFavoriteSong(index);
+                }
+            });
+            container.appendChild(a);
+        });
+        container.style.display = 'block';
+    }
+
+    // Inizializza la searchbar
+    initializeSearch();
 });
