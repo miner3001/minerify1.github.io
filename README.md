@@ -21,7 +21,6 @@
 *   **Pagina Premium:** Una pagina che illustra i vantaggi dell'abbonamento premium di Minerify, come l'ascolto senza pubblicità e la possibilità di ascoltare offline.
 
     *   **Piani di Abbonamento:** Presenta diversi piani di abbonamento (Premium, Premium Family, Premium Student) con i relativi prezzi e vantaggi.
-    *   **Transizione Fluida:** La musica continua a suonare anche quando si visita la pagina Premium.
     *   **Design Accattivante:** Un tema blu neon moderno e accattivante.
 
 ## Tecnologie utilizzate:
