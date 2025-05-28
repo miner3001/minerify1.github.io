@@ -144,6 +144,7 @@ header h1 {
     from {
         transform: translateY(0);
     }
+
     to {
         transform: translateY(-100%);
     }
@@ -155,8 +156,9 @@ header h1 {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 0;
+    padding: 15px;
     margin-left: auto;
+
 }
 
 .hamburger-line {
