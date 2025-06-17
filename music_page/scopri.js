@@ -408,6 +408,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inizializza le stelle
     initializeStars();
+
+    // Mostra loader quando l'audio sta caricando
+    audioPlayer.addEventListener('loadstart', function() {
+        document.getElementById('audio-loader').style.display = 'block';
+    });
+    // Nasconde loader quando l'audio è pronto
+    audioPlayer.addEventListener('canplaythrough', function() {
+        document.getElementById('audio-loader').style.display = 'none';
+    });
+    // Nasconde loader anche in caso di errore
+    audioPlayer.addEventListener('error', function() {
+        document.getElementById('audio-loader').style.display = 'none';
+    });
 });
 
 function initializeSearch() {
