@@ -3,8 +3,7 @@ body {
     background-color: #000000;
     color: #fff;
     margin: 0;
-    padding: 0;
-    overflow: hidden; /* Rimuove entrambe le barre di scorrimento */
+    padding: 0;/* Rimuove entrambe le barre di scorrimento */
     height: auto; /* Permette al contenuto di adattarsi all'altezza */
     position: relative;
     display: flex;
