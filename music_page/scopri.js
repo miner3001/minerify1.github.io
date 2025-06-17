@@ -201,24 +201,22 @@ document.addEventListener('DOMContentLoaded', function () {
         overlay.querySelector('.album-artist').textContent = `Artista: ${albumArtist}`;
         songList.innerHTML = '';
 
-        // Aggiungi le canzoni alla lista con la durata reale
+        // Aggiungi le canzoni alla lista con la durata dalla mappa
         albumSongs.forEach((song, index) => {
             const li = document.createElement('li');
             li.classList.add('song-item');
+            const src = albumSrcs[index];
+            let durationText = 'N/D';
+            if (trackDurations[src]) {
+                const min = Math.floor(trackDurations[src] / 60);
+                const sec = trackDurations[src] % 60;
+                durationText = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            }
             li.innerHTML = `
                 <span class="song-name">${index + 1}. ${song}</span>
-                <span class="song-duration" id="duration-${index}">Caricamento...</span>
+                <span class="song-duration" id="duration-${index}">${durationText}</span>
             `;
             songList.appendChild(li);
-
-            // Calcola la durata reale della canzone
-            const audio = new Audio(albumSrcs[index]);
-            audio.addEventListener('loadedmetadata', function () {
-                const durationMinutes = Math.floor(audio.duration / 60);
-                const durationSeconds = Math.floor(audio.duration % 60);
-                const formattedDuration = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
-                document.getElementById(`duration-${index}`).textContent = formattedDuration;
-            });
 
             // Listener per riprodurre la canzone cliccata
             li.addEventListener('click', function () {
@@ -422,6 +420,17 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('audio-loader').style.display = 'none';
     });
 });
+
+// Mappa delle durate delle tracce (secondi) per ogni file audio
+const trackDurations = {
+    // Esempio: 'music/1.mp3': 180, // 3:00
+    'music/1.mp3': 180,
+    'music/2.mp3': 200,
+    'music/3.mp3': 210,
+    'music/4.mp3': 195,
+    'music/5.mp3': 205,
+    // ...aggiungi qui tutte le altre tracce...
+};
 
 function initializeSearch() {
     const searchBar = document.getElementById('search-bar');
