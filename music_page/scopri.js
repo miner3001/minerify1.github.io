@@ -424,11 +424,24 @@ document.addEventListener('DOMContentLoaded', function () {
 // Mappa delle durate delle tracce (secondi) per ogni file audio
 const trackDurations = {
     // Esempio: 'music/1.mp3': 180, // 3:00
-    'music/1.mp3': 180,
-    'music/2.mp3': 200,
-    'music/3.mp3': 210,
-    'music/4.mp3': 195,
-    'music/5.mp3': 205,
+     'music/1.mp3': 119,   // 1 min e 59 secondi
+  'music/2.mp3': 232,   // 3 min e 52 secondi
+  'music/3.mp3': 194,   // 3 min e 14 secondi
+  'music/4.mp3': 144,   // 2 min e 24 secondi
+  'music/5.mp3': 186,   // 3 min e 06 secondi
+  'music/61.mp3': 176,  // 2 min e 56 secondi
+  'music/62.mp3': 183,  // 3 min e 03 secondi
+  'music/63.mp3': 147,  // 2 min e 27 secondi
+  'music/64.mp3': 130,  // 2 min e 10 secondi
+  'music/65.mp3': 186,  // 3 min e 06 secondi
+  'music/66.mp3': 203,  // 3 min e 23 secondi
+  'music/67.mp3': 203,  // 3 min e 23 secondi
+  'music/68.mp3': 168,  // 2 min e 48 secondi
+  'music/69.mp3': 147,  // 2 min e 27 secondi
+  'music/70.mp3': 167,  // 2 min e 47 secondi
+  'music/71.mp3': 177,  // 2 min e 57 secondi
+  'music/72.mp3': 217,  // 3 min e 37 secondi
+  'music/73.mp3': 226   // 3 min e 46 secondi
     // ...aggiungi qui tutte le altre tracce...
 };
 
