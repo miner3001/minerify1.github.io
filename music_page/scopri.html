@@ -19,6 +19,11 @@
 
     <header>
         <h1>Minerify</h1>
+        <button class="hamburger-menu" aria-label="Menu" aria-expanded="false">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+        </button>
     </header>
 
     <nav class="nav">
@@ -227,6 +232,28 @@
     </div>
 
     <script src="scopri.js"></script>
+    <script>
+        // Hamburger Menu
+        const hamburgerMenu = document.querySelector('.hamburger-menu');
+        const nav = document.querySelector('.nav');
+
+        hamburgerMenu.addEventListener('click', () => {
+            nav.classList.toggle('nav--open');
+            hamburgerMenu.classList.toggle('is-active');
+            hamburgerMenu.setAttribute('aria-expanded',
+                hamburgerMenu.classList.contains('is-active')
+            );
+        });
+
+        // Chiudi il menu quando si clicca su un link
+        document.querySelectorAll('.nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('nav--open');
+                hamburgerMenu.classList.remove('is-active');
+                hamburgerMenu.setAttribute('aria-expanded', 'false');
+            });
+        });
+    </script>
 </body>
 
 </html>
