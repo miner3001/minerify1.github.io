@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then(() => {
                         currentSong.textContent = currentAlbumNames[index];
                         currentAlbumCover.src = currentAlbumCoverSrc;
-                        playPauseButton.textContent = '⏸️';
+                        playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
                         isPlaying = true;
                         updateLikeButton();
                         savePlayerState();

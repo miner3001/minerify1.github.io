@@ -43,31 +43,33 @@
 <div class="stars"></div>
 
 <div class="player-bar">
-    <div class="player-info">
-        <img id="current-album-cover" src="" alt="Album Cover" class="album-cover">
-        <div class="song-details">
-            <p id="current-song">Nessuna canzone in riproduzione</p>
+        <div class="player-info">
+            <img id="current-album-cover" src="" alt="Album Cover" class="album-cover">
+            <div class="song-details">
+                <p id="current-song">Nessuna canzone in riproduzione</p>
+            </div>
         </div>
+        <div class="player-controls">
+            <button id="prev-song"><i class="bi bi-skip-start-fill"></i></button>
+            <button id="play-pause"><i class="bi bi-play-fill"></i></button>
+            <button id="next-song"><i class="bi bi-skip-end-fill"></i></button>
+            <button id="shuffle"><i class="bi bi-shuffle"></i></button>
+            <button id="loop"><i class="bi bi-repeat"></i></button>
+            <span id="current-time">0:00</span>
+            <input type="range" id="progress-bar" value="0" max="100">
+            <span id="total-duration">0:00</span>
+        </div>
+        <div class="volume-controls">
+            <input type="range" id="volume-control" value="50" max="100">
+        </div>
+        <div class="equalizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <button id="like-button" class="like-button"><i class="bi bi-heart"></i></button>
     </div>
-    <div class="player-controls">
-        <button id="prev-song"><i class="bi bi-skip-start-fill"></i></button>
-        <button id="play-pause"><i class="bi bi-play-fill"></i></button>
-        <button id="next-song"><i class="bi bi-skip-end-fill"></i></button>
-        <span id="current-time">0:00</span>
-        <input type="range" id="progress-bar" value="0" max="100">
-        <span id="total-duration">0:00</span>
-    </div>
-    <div class="volume-controls">
-          <input type="range" id="volume-control" value="50" max="100">
-    </div>
-    <div class="equalizer">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-    </div>
-    <button id="like-button" class="like-button">❤️</button> <!-- Pulsante per i preferiti -->
-</div>
 
 <audio id="audio-player" src=""></audio>
 

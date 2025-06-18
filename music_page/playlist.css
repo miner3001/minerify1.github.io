@@ -164,7 +164,7 @@ header h1 {
 }
 
 .footer a {
-    color: #1DB954;
+    color: #007acc;
     text-decoration: none;
 }
 
@@ -292,11 +292,11 @@ player-controls {
 }
 
 .player-controls button:hover {
-    color: #1db954;
+    color: #007acc;
 }
 
 #shuffle.active, #loop.active {
-    color: #1db954;
+    color: #007acc;
 }
 
 #progress-bar {
@@ -325,7 +325,7 @@ player-controls {
 #progress-bar::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -355,7 +355,7 @@ player-controls {
     appearance: none;
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -364,7 +364,7 @@ player-controls {
 #volume-control::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -417,7 +417,7 @@ player-controls {
 }
 
 .close-btn:hover {
-    color: #1db954;
+    color: #007acc;
 }
 
 .album-details {
@@ -477,7 +477,7 @@ player-controls {
 }
 
 .song-item.playing {
-    background-color: #1db954;
+    background-color: #007acc;
     color: #000;
 }
 
@@ -486,7 +486,7 @@ button {
 }
 
 button:hover {
-    background-color: #1db954;
+    background-color: #007acc;
     color: #fff;
 }
 
@@ -500,7 +500,7 @@ button:hover {
 .bar {
     width: 5px;
     height: 100%;
-    background-color: #1db954;
+    background-color: #007acc;
     margin: 0 1px;
     animation: equalizer 1s infinite;
     transition: height 0.1s;
@@ -545,6 +545,63 @@ button:hover {
     .volume-controls {
         width: 100%;
         justify-content: flex-start;
+    }
+}
+
+@media (min-width: 769px) {
+    .album-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 32px;
+        justify-items: center;
+        align-items: stretch;
+    }
+    .album-card {
+        width: 100%;
+        max-width: 340px;
+        min-height: 370px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+        padding-bottom: 18px;
+    }
+    .album-card img {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        transition: transform 0.3s;
+    }
+    .album-card h3 {
+        margin: 10px 0 8px 0;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .album-card .listen-now,
+    .album-card .remove-favorite {
+        margin-top: 8px;
+    }
+    .album-card .listen-now {
+        align-self: stretch;
+    }
+    .album-card .remove-favorite {
+        align-self: stretch;
+    }
+    .album-card .listen-now,
+    .album-card .remove-favorite {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .album-card .listen-now + .remove-favorite {
+        margin-top: 6px;
     }
 }
 
@@ -647,6 +704,61 @@ button:hover {
 }
 
 .song-item.playing {
-    background-color: #1db954;
+    background-color: #007acc;
     color: #000;
+}
+
+.playlist-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.playlist-container h2 {
+    text-align: center;
+    font-size: 2.2em;
+    margin-top: 40px;
+    margin-bottom: 18px;
+    color: #007acc;
+    letter-spacing: 0.5px;
+}
+
+.album-container {
+    width: 100%;
+    margin: 0 auto 40px auto;
+    box-sizing: border-box;
+}
+
+.album-card .remove-favorite {
+    background: transparent !important;
+    color: #ff4b4b;
+    border: none;
+    font-size: 1.5em;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    box-shadow: none;
+}
+.album-card .remove-favorite:hover {
+    color: #ff1a1a;
+    background: transparent !important;
+    transform: scale(1.2);
+}
+
+#like-button.like-button {
+    background: transparent !important;
+    border: none;
+    box-shadow: none;
+    color: #ff4b4b;
+    font-size: 1.7em;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    padding: 0 10px;
+}
+#like-button.like-button:hover {
+    color: #ff1a1a;
+    background: transparent !important;
+    transform: scale(1.15);
 }
