@@ -501,6 +501,42 @@ const trackDurations = {
     'music/26.mp3': 217,  // Mentalité - Baby Gang (3:37)
     'music/27.mp3': 212,  // Lei - Baby Gang (3:32)
     'music/28.mp3': 169,  // Mamacita - Baby Gang (2:49)
+
+    // UTOPIA - Travis Scott
+    'music/29.mp3': 222,  // HYAENA - Travis Scott (3:42)
+    'music/30.mp3': 184,  // THANK GOD - Travis Scott (3:04)
+    'music/31.mp3': 255,  // MODERN JAM (Ft. Teezo Touchdown) - Travis Scott (4:15)
+    'music/32.mp3': 251,  // MY EYES - Travis Scott (4:11)
+    'music/33.mp3': 127,  // GOD’S COUNTRY - Travis Scott (2:07)
+    'music/34.mp3': 204,  // SIRENS - Travis Scott (3:24)
+    'music/35.mp3': 246,  // MELTDOWN (Ft. Drake) - Travis Scott (4:06)
+    'music/36.mp3': 191,  // FE!N (Ft. Playboi Carti) - Travis Scott (3:11)
+    'music/37.mp3': 274,  // DELRESTO (ECHOES) - Beyoncé & Travis Scott (4:34)
+    'music/38.mp3': 211,  // I KNOW ? - Travis Scott (3:31)
+    'music/39.mp3': 223,  // TOPIA TWINS (Ft. 21 Savage & Rob49) - Travis Scott (3:43)
+    'music/40.mp3': 258,  // CIRCUS MAXIMUS (Ft. Swae Lee & The Weeknd) - Travis Scott (4:18)
+    'music/41.mp3': 154,  // PARASAIL (Ft. Dave Chappelle & Yung Lean) - Travis Scott (2:34)
+    'music/42.mp3': 366,  // SKITZO (Ft. Young Thug) - Travis Scott (6:06)
+    'music/43.mp3': 163,  // LOST FOREVER (Ft. Westside Gunn) - Travis Scott (2:43)
+    'music/44.mp3': 226,  // LOOOVE (Ft. Kid Cudi) - Travis Scott (3:46)
+    'music/45.mp3': 185,  // K-POP (Ft. Bad Bunny & The Weeknd) - Travis Scott (3:05)
+    'music/46.mp3': 353,  // TELEKINESIS (Ft. Future & SZA) - Travis Scott (5:53)
+
+    // 20 capo plaza 
+    'music/47.mp3': 241,  // 20 - Capo Plaza (4:01)
+    'music/48.mp3': 180,  // Giù da me - Capo Plaza (3:00)
+    'music/49.mp3': 185,  // Tesla (Ft. DrefGold & Sfera Ebbasta) - Capo Plaza (3:05)
+    'music/50.mp3': 146,  // Nike Boy - Capo Plaza (2:26)
+    'music/51.mp3': 197,  // Come me - Capo Plaza (3:17)
+    'music/52.mp3': 208,  // J$ JP - Capo Plaza (3:28)
+    'music/53.mp3': 135,  // Interlude (Ora è la mia ora) - Capo Plaza (2:15)
+    'music/54.mp3': 234,  // Ne è valsa la pena (Ft. Ghali) - Capo Plaza (3:54)
+    'music/55.mp3': 208,  // Non cambierò mai - Capo Plaza (3:28)
+    'music/56.mp3': 194,  // Taxi - Capo Plaza (3:14)
+    'music/57.mp3': 208,  // Uno squillo - Capo Plaza (3:28)
+    'music/58.mp3': 195,  // Vabbene - Capo Plaza (3:15)
+    'music/59.mp3': 219,  // Forte e chiaro - Capo Plaza (3:39)
+    'music/60.mp3': 221,  // Giovane fuoriclasse - Capo Plaza (3:41)
 };
 
 function initializeSearch() {
