@@ -1,0 +1,2 @@
+canzoni casuali
+file txt o json con credenziali che si possono aggiungere
