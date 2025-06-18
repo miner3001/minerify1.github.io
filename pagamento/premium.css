@@ -76,12 +76,12 @@ header h1 {
 
 .plan .price {
     font-size: 2em;
-    color: #1DB954;
+    color: #007acc;
     margin-bottom: 20px;
 }
 
 .plan .button {
-    background-color: #1DB954;
+    background-color: #007acc;
     color: #fff;
     padding: 15px 30px;
     border: none;
@@ -93,7 +93,7 @@ header h1 {
 }
 
 .plan .button:hover {
-    background-color: #1ed760;
+    background-color: #0094ff;
 }
 
 .footer {
@@ -106,7 +106,7 @@ header h1 {
 }
 
 .footer a {
-    color: #1DB954;
+    color: #007acc;
     text-decoration: none;
 }
 

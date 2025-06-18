@@ -207,17 +207,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         results.forEach(song => {
-            const a = document.createElement('a');
-            a.href = '#';
-            a.textContent = song.name;
-            a.addEventListener('click', function (event) {
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'search-result';
+            resultDiv.innerHTML = `
+                <img src="${song.cover}" alt="${song.name}">
+                <div class="result-info">
+                    <h4>${song.name}</h4>
+                    <p>${song.artist ? song.artist : ''}</p>
+                </div>
+            `;
+            resultDiv.addEventListener('click', function (event) {
                 event.preventDefault();
                 const index = likedSongs.indexOf(song);
                 if (index !== -1) {
                     playFavoriteSong(index);
                 }
             });
-            container.appendChild(a);
+            container.appendChild(resultDiv);
         });
         container.style.display = 'block';
     }
