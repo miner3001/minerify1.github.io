@@ -79,11 +79,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     audioPlayer.play()
                         .then(() => {
                             isPlaying = true;
-                            playPauseButton.textContent = '⏸️';
+                            playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
                         })
                         .catch(() => {
                             isPlaying = false;
-                            playPauseButton.textContent = '▶️';
+                            playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
                         });
                 }
 
@@ -255,11 +255,11 @@ document.addEventListener('DOMContentLoaded', function () {
     playPauseButton.addEventListener('click', function () {
         if (isPlaying) {
             audioPlayer.pause();
-            playPauseButton.textContent = '▶️';
+            playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
             isPlaying = false;
         } else {
             audioPlayer.play();
-            playPauseButton.textContent = '⏸️';
+            playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             isPlaying = true;
         }
     });

@@ -167,7 +167,7 @@ header h1 {
 }
 
 .footer a {
-    color: #1DB954;
+    color: #007acc;
     text-decoration: none;
 }
 
@@ -298,11 +298,11 @@ player-controls {
 }
 
 .player-controls button:hover {
-    color: #1db954;
+    color: #007acc; /* Colore blu al passaggio del mouse */
 }
 
 #shuffle.active, #loop.active {
-    color: #1db954; /* Colore verde quando attivo */
+    color: #007acc; /* Colore blu quando attivo */
 }
 
 #progress-bar {
@@ -331,7 +331,7 @@ player-controls {
 #progress-bar::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -361,7 +361,7 @@ player-controls {
     appearance: none;
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -370,7 +370,7 @@ player-controls {
 #volume-control::-moz-range-thumb {
     width: 15px;
     height: 15px;
-    background: #1db954;
+    background: #007acc;
     border-radius: 50%;
     cursor: pointer;
     transition: background 0.3s;
@@ -423,7 +423,7 @@ player-controls {
 }
 
 .close-btn:hover {
-    color: #1db954;
+    color: #007acc;
 }
 
 .album-details {
@@ -483,7 +483,7 @@ player-controls {
 }
 
 .song-list li.playing {
-    color: #1DB954;
+    color: #007acc;
 }
 
 button {
@@ -491,7 +491,7 @@ button {
 }
 
 button:hover {
-    background-color: #1db954;
+    background-color: #007acc;
     color: #fff;
 }
 
@@ -505,7 +505,7 @@ button:hover {
 .bar {
     width: 5px;
     height: 100%;
-    background-color: #1db954;
+    background-color: #007acc;
     margin: 0 1px;
     animation: equalizer 1s infinite;
     transition: height 0.1s;

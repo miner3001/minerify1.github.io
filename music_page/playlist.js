@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateLikeButton() {
         const currentSongSrc = audioPlayer.src;
         const isLiked = likedSongs.some(song => song.src === currentSongSrc);
-        likeButton.textContent = isLiked ? "❤️" : "🤍"; // Rosso se nei preferiti, bianco altrimenti
+        likeButton.innerHTML = isLiked ? '<i class="bi bi-heart-fill"></i>' : '<i class="bi bi-heart"></i>';
     }
 
     // Salva lo stato del player nel localStorage
@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (isPlaying) {
                 audioPlayer.play();
-                playPauseButton.textContent = '⏸️';
+                playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             } else {
-                playPauseButton.textContent = '▶️';
+                playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
             }
         }
     }
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
             audioPlayer.play();
             currentSong.textContent = song.name;
             currentAlbumCover.src = song.cover;
-            playPauseButton.textContent = '⏸️';
+            playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             isPlaying = true;
             currentFavoriteIndex = index;
             updateLikeButton();
@@ -127,11 +127,11 @@ document.addEventListener('DOMContentLoaded', function () {
     playPauseButton.addEventListener('click', function () {
         if (isPlaying) {
             audioPlayer.pause();
-            playPauseButton.textContent = '▶️';
+            playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
             isPlaying = false;
         } else {
             audioPlayer.play();
-            playPauseButton.textContent = '⏸️';
+            playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             isPlaying = true;
         }
         savePlayerState();
