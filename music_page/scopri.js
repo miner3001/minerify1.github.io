@@ -112,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Funzione per riprodurre una canzone
     function playSong(index) {
+        document.getElementById('audio-loading').style.display = 'block';
+
         if (!currentAlbumSongs || !currentAlbumSongs.length || index < 0 || index >= currentAlbumSongs.length) {
             console.error('Indice canzone non valido o nessun album selezionato');
             return;
@@ -143,6 +145,13 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (error) {
             console.error('Errore critico:', error);
         }
+
+        audioPlayer.oncanplay = function() {
+            document.getElementById('audio-loading').style.display = 'none';
+        };
+        audioPlayer.onerror = function() {
+            document.getElementById('audio-loading').style.display = 'none';
+        };
     }
 
     // Funzione per passare all'album successivo
@@ -407,10 +416,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Inizializza le stelle
     initializeStars();
 
-    // Mostra loader quando l'audio sta caricando
-    audioPlayer.addEventListener('loadstart', function () {
-        document.getElementById('audio-loading').style.display = 'block';
-    });
     // Nasconde loader quando l'audio è pronto
     audioPlayer.addEventListener('canplaythrough', function () {
         document.getElementById('audio-loading').style.display = 'none';
