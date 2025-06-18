@@ -537,6 +537,132 @@ const trackDurations = {
     'music/58.mp3': 195,  // Vabbene - Capo Plaza (3:15)
     'music/59.mp3': 219,  // Forte e chiaro - Capo Plaza (3:39)
     'music/60.mp3': 221,  // Giovane fuoriclasse - Capo Plaza (3:41)
+
+    // I Nomi del Diavolo - Kid Yugi
+    'music/100.mp3': 135,  // L’Anticristo (2:15)
+    'music/101.mp3': 195,  // Capra a tre Teste (Ft. Artie 5ive & Tony Boy) (3:15)
+    'music/102.mp3': 160,  // Eva (Ft. Tedua) (2:40)
+    'music/103.mp3': 206,  // Servizio (Ft. Noyz Narcos & Papa V) (3:26)
+    'music/104.mp3': 193,  // Il Signore delle Mosche (3:13)
+    'music/105.mp3': 164,  // Lilith (2:44)
+    'music/106.mp3': 185,  // Nemico (Ft. Ernia) (3:05)
+    'music/107.mp3': 144,  // Denaro (Ft. Simba La Rue) (2:24)
+    'music/108.mp3': 185,  // Yung 3p 4 (3:05)
+    'music/109.mp3': 186,  // Terr1 (Ft. Geolier) (3:06)
+    'music/110.mp3': 188,  // Ilva (Fume scure rmx) (Ft. Fido Guido) (3:08)
+    'music/111.mp3': 174,  // Paganini (2:54)
+    'music/112.mp3': 178,  // Ex Angelo (Ft. Sfera Ebbasta) (2:58)
+    'music/113.mp3': 180,  // Lucifero (3:00)
+
+    // Morad
+    'music/114.mp3': 160,  // Cristales (2:40)
+    'music/115.mp3': 185,  // Paz (by Morad & NICKI NICOLE) (3:05)
+    'music/116.mp3': 174,  // Mi Barrio (2:54)
+    'music/117.mp3': 203,  // No Estuviste En Lo Malo (3:23)
+    'music/118.mp3': 202,  // Andando (by Morad, Eladio Carrión & Beny Jr) (3:22)
+    'music/119.mp3': 178,  // Soledad (2:58)
+    'music/120.mp3': 185,  // Estopa (3:05)
+    'music/121.mp3': 183,  // Niños Pequeños (3:03)
+    'music/122.mp3': 207,  // María (Ft. Ninho) (3:27)
+    'music/123.mp3': 174,  // Poporopa (2:54)
+    'music/124.mp3': 173,  // Se Grita (Ft. JuL) (2:53)
+    'music/125.mp3': 177,  // Por Los Míos (2:57)
+    'music/126.mp3': 190,  // Ojos Sin Ver (by Morad & ElGrandeToto) (3:10)
+    'music/127.mp3': 175,  // Desespero (by Morad & Rvfv) (2:55)
+    'music/128.mp3': 195,  // Problemas (3:15)
+    'music/129.mp3': 174,  // Walou Bla Bla (2:54)
+    'music/130.mp3': 180,  // Un Amigo Me Falló (3:00)
+    'music/131.mp3': 185,  // Tiempo de Nada (3:05)
+    'music/132.mp3': 180,  // Caballero (3:00)
+
+    // in piazza ci muori 
+    'music/133.mp3': 207, // Napoletano - 3:27
+    'music/134.mp3': 185, // Piazza di spaccio 2 (Ft. Simba La Rue) - 3:05
+    'music/135.mp3': 174, // Fuori Milano - 2:54
+    'music/136.mp3': 190, // Regole del blocco (Ft. Sacky) - 3:10
+    'music/137.mp3': 202, // Gomorra (Ft. Artie 5ive) - 3:22
+    'music/138.mp3': 169, // Gucci bag - 2:49
+    'music/139.mp3': 213, // Gangsta life (Ft. Fre_nky & MadPrince (ITA)) - 3:33
+    'music/140.mp3': 201, // Piove (Ft. Neima Ezza) - 3:21
+    'music/141.mp3': 196, // Sotto indagine (Ft. Savage 167) - 3:16
+    'music/142.mp3': 225, // L’ultima notte - 3:45
+
+    //fsk trapshit revenge 
+   'music/143.mp3': 225,  // BLA BLA - 3:45
+  'music/144.mp3': 192,  // ANSIA NO - 3:12
+  'music/145.mp3': 198,  // CAMOSCIO - 3:18
+  'music/146.mp3': 209,  // CAPI DELLA TRAP (Ft. Guè) - 3:29
+  'music/147.mp3': 185,  // NON FARCELO FARE - 3:05
+  'music/148.mp3': 176,  // FRAGOLA EROINA - 2:56
+  'music/149.mp3': 215,  // PIÙ DI UN KILO - 3:35
+  'music/150.mp3': 172,  // UP - 2:52
+  'music/151.mp3': 202,  // NO SPIE - 3:22
+  'music/152.mp3': 189,  // CATENE JESUS - 3:09
+  'music/153.mp3': 207,  // 4L (Ft. Rosa Chemical) - 3:27
+  'music/154.mp3': 191,  // OK NO PLAY - 3:11
+  'music/155.mp3': 223,  // LA PROVA DEL CUOCO - 3:43
+  'music/156.mp3': 195,  // MELISSA P - 3:15
+  'music/157.mp3': 169,  // NON E' MIA - 2:49
+  'music/158.mp3': 200,  // CANOTTIERA WHITE - 3:20
+  'music/159.mp3': 190,  // ABBIAMO - 3:10
+  'music/160.mp3': 213,  // PICKUP (Ft. DAYTONA KK) - 3:33
+
+  //milano demons
+   'music/161.mp3': 199,  // Milano Demons - 3:19
+  'music/162.mp3': 171,  // Cup - 2:51
+  'music/163.mp3': 188,  // Vorrei (Ft. Lazza) - 3:08
+  'music/164.mp3': 158,  // Take 4 - 2:38
+  'music/165.mp3': 209,  // Rollie AP (Ft. Pyrex & Slings) - 3:29
+  'music/166.mp3': 185,  // Cellphone (Ft. Bianca Costa & Rhove) - 3:05
+  'music/167.mp3': 187,  // Diamante - 3:07
+  'music/168.mp3': 195,  // Non è Easy - 3:15
+  'music/169.mp3': 75,   // Messaggio in Segreteria (interlude) - 1:15
+  'music/170.mp3': 211,  // Cicatrici (Ft. Tedua) - 3:31
+  'music/171.mp3': 185,  // Non lo Sai - 3:05
+  'music/172.mp3': 182,  // Naturale - 3:02
+  'music/173.mp3': 192,  // Alleluia (Ft. Sfera Ebbasta) - 3:12
+  'music/174.mp3': 206,  // Soldi Puliti - 3:26
+  'music/175.mp3': 187,  // Dimenticare (Ft. Federica Abbate) - 3:07
+  'music/176.mp3': 189,  // Un Altro Show (Ft. Geolier) - 3:09
+  'music/177.mp3': 194,  // Se Fosse Per Me - 3:14
+  'music/178.mp3': 116,  // 3 Stick Freestyle - 1:56
+
+  //sfera ebbasta 
+    'music/179.mp3': 199, // Equilibrio - 3:19
+  'music/180.mp3': 187, // Figli Di Papà - 3:07
+  'music/181.mp3': 205, // Balenciaga (Ft. SCH) - 3:25
+  'music/182.mp3': 216, // Notti - 3:36
+  'music/183.mp3': 198, // Visiera A Becco - 3:18
+  'music/184.mp3': 196, // No No - 3:16
+  'music/185.mp3': 196, // BRNBQ - 3:16
+  'music/186.mp3': 191, // Bang Bang - 3:11
+  'music/187.mp3': 202, // Quello Che Non Va - 3:22
+  'music/188.mp3': 220, // Cartine Cartier by SCH (Ft. Sfera Ebbasta) - 3:40
+  'music/189.mp3': 190, // BHMG - 3:10
+
+  //salvatore vive
+  'music/190.mp3': 177, // Salvatore vive - Paky - 2:57
+  'music/191.mp3': 135, // Belen - Paky - 2:15
+  'music/192.mp3': 125, // Sharm El Sheikh - Paky - 2:05
+  'music/193.mp3': 194, // La Bellavita (Ft. JuL) - Paky - 3:14
+  'music/194.mp3': 192, // Onore e rispetto - Paky - 3:12
+  'music/195.mp3': 170, // Intro - Paky - 2:50
+  'music/196.mp3': 124, // 100 Uomini - Paky - 2:04
+  'music/197.mp3': 175, // Blauer - Paky - 2:55
+  'music/198.mp3': 122, // No wallet (Ft. Marracash) - Paky - 2:02
+  'music/199.mp3': 122, // Pascià - Paky - 2:02
+  'music/200.mp3': 159, // Auto tedesca - Paky - 2:39
+  'music/201.mp3': 181, // Star (Ft. Shiva) - Paky - 3:01
+  'music/202.mp3': 213, // Salvatore - Paky - 3:33
+  'music/203.mp3': 164, // Quando piove - Paky - 2:44
+  'music/204.mp3': 184, // Vivi o muori (Ft. Guè) - Paky - 3:04
+  'music/205.mp3': 193, // Vita sbagliata - Paky - 3:13
+  'music/206.mp3': 189, // Comandamento (Ft. Geolier) - Paky - 3:09
+  'music/207.mp3': 170, // Giorno del giudizio (Ft. Luchè & Mahmood) - Paky - 2:50
+  'music/208.mp3': 186, // Mi manchi - Paky - 3:06
+  'music/209.mp3': 167, // Storie tristi - Paky - 2:47
+  'music/210.mp3': 170, // Mama I’m a Criminal - Paky - 2:50
+  'music/211.mp3': 104  // Bronx - Paky - 1:44
 };
 
 function initializeSearch() {
