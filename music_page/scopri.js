@@ -409,15 +409,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Mostra loader quando l'audio sta caricando
     audioPlayer.addEventListener('loadstart', function () {
-        document.getElementById('audio-loader').style.display = 'block';
+        document.getElementById('audio-loading').style.display = 'block';
     });
     // Nasconde loader quando l'audio è pronto
     audioPlayer.addEventListener('canplaythrough', function () {
-        document.getElementById('audio-loader').style.display = 'none';
+        document.getElementById('audio-loading').style.display = 'none';
     });
     // Nasconde loader anche in caso di errore
     audioPlayer.addEventListener('error', function () {
-        document.getElementById('audio-loader').style.display = 'none';
+        document.getElementById('audio-loading').style.display = 'none';
     });
 });
 
@@ -857,4 +857,23 @@ function findNextAlbumCard() {
     }
 
     return null;
+}
+
+function playSong(src) {
+    // Mostra il caricamento solo quando parte una canzone
+    document.getElementById('audio-loading').style.display = 'block';
+
+    const audio = document.getElementById('audio-player');
+    audio.src = src;
+    audio.load();
+    audio.play();
+
+    // Nascondi il caricamento quando l'audio è pronto
+    audio.oncanplay = function() {
+        document.getElementById('audio-loading').style.display = 'none';
+    };
+    // Nascondi anche in caso di errore
+    audio.onerror = function() {
+        document.getElementById('audio-loading').style.display = 'none';
+    };
 }

@@ -663,3 +663,7 @@ button:hover {
     background-color: #1db954; /* Sfondo verde per la canzone in riproduzione */
     color: #000; /* Testo nero per la canzone in riproduzione */
 }
+
+#audio-loading {
+  display: none;
+}
