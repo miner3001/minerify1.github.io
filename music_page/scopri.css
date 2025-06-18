@@ -9,6 +9,15 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    scroll-behavior: smooth; /* Aggiunge uno scorrimento fluido */
+    overflow-x: hidden; /* Blocca lo scroll orizzontale */
+    overflow-y: auto; /* Consente lo scroll verticale */
+    scrollbar-width: none; /* Nasconde la scrollbar in Firefox */
+    -ms-overflow-style: none; /* Nasconde la scrollbar in IE/Edge */
+    width: 100%;
+    height: 100vh; /* Imposta l'altezza al 100% della viewport */
+    position: relative; /* Necessario per posizionare gli elementi figli */
+    
     
 }
 
