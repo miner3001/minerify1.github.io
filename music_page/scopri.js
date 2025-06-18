@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentSongIndex = savedState.currentSongIndex || 0;
                 isShuffle = savedState.isShuffle || false;
                 isLoop = savedState.isLoop || false;
-                
+
                 if (savedState.isPlaying) {
                     audioPlayer.play()
                         .then(() => {
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             playPauseButton.textContent = '▶️';
                         });
                 }
-                
+
                 updateLikeButton();
                 updateShuffleLoopButtons();
             }
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             currentSongIndex = index;
             audioPlayer.src = currentAlbumSongs[index];
-            
+
             const playPromise = audioPlayer.play();
             if (playPromise !== undefined) {
                 playPromise
@@ -149,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function playNextAlbum() {
         const albumCards = document.querySelectorAll('.album-card');
         let currentAlbumCard = null;
-        
+
         // Trova l'album corrente
         for (let i = 0; i < albumCards.length; i++) {
             if (albumCards[i].querySelector('img')?.src === currentAlbumCoverSrc) {
@@ -162,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const currentIndex = Array.from(albumCards).indexOf(currentAlbumCard);
             const nextIndex = (currentIndex + 1) % albumCards.length;
             const nextAlbum = albumCards[nextIndex];
-            
+
             if (nextAlbum) {
                 const listenNowButton = nextAlbum.querySelector('.listen-now');
                 if (listenNowButton) {
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentAlbumNames = listenNowButton.getAttribute('data-names').split(',');
                     currentAlbumCoverSrc = nextAlbum.querySelector('img').src;
                     currentSongIndex = 0;
-                    
+
                     // Riproduci la prima canzone del nuovo album
                     playSong(0);
-                    
+
                     // Salva lo stato per mantenere la coerenza
                     savePlayerState();
                 }
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Modifica il listener per la fine della canzone
-    audioPlayer.addEventListener('ended', function() {
+    audioPlayer.addEventListener('ended', function () {
         if (isLoop) {
             playSong(currentSongIndex);
         } else if (isShuffle) {
@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Last song in album, find and play next album
             const albumCards = document.querySelectorAll('.album-card');
             let currentAlbumCard = null;
-            
+
             // Find current album card
             for (let i = 0; i < albumCards.length; i++) {
                 if (albumCards[i].querySelector('img').src === currentAlbumCoverSrc) {
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const currentIndex = Array.from(albumCards).indexOf(currentAlbumCard);
                 const nextIndex = (currentIndex + 1) % albumCards.length;
                 const nextAlbum = albumCards[nextIndex];
-                
+
                 if (nextAlbum) {
                     const listenNowButton = nextAlbum.querySelector('.listen-now');
                     if (listenNowButton) {
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         currentAlbumNames = listenNowButton.getAttribute('data-names').split(',');
                         currentAlbumCoverSrc = nextAlbum.querySelector('img').src;
                         currentSongIndex = 0;
-                        
+
                         // Play first song of next album immediately
                         playSong(0);
                     }
@@ -408,15 +408,15 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeStars();
 
     // Mostra loader quando l'audio sta caricando
-    audioPlayer.addEventListener('loadstart', function() {
+    audioPlayer.addEventListener('loadstart', function () {
         document.getElementById('audio-loader').style.display = 'block';
     });
     // Nasconde loader quando l'audio è pronto
-    audioPlayer.addEventListener('canplaythrough', function() {
+    audioPlayer.addEventListener('canplaythrough', function () {
         document.getElementById('audio-loader').style.display = 'none';
     });
     // Nasconde loader anche in caso di errore
-    audioPlayer.addEventListener('error', function() {
+    audioPlayer.addEventListener('error', function () {
         document.getElementById('audio-loader').style.display = 'none';
     });
 });
@@ -424,25 +424,83 @@ document.addEventListener('DOMContentLoaded', function () {
 // Mappa delle durate delle tracce (secondi) per ogni file audio
 const trackDurations = {
     // Esempio: 'music/1.mp3': 180, // 3:00
-     'music/1.mp3': 119,   // 1 min e 59 secondi
-  'music/2.mp3': 232,   // 3 min e 52 secondi
-  'music/3.mp3': 194,   // 3 min e 14 secondi
-  'music/4.mp3': 144,   // 2 min e 24 secondi
-  'music/5.mp3': 186,   // 3 min e 06 secondi
-  'music/61.mp3': 176,  // 2 min e 56 secondi
-  'music/62.mp3': 183,  // 3 min e 03 secondi
-  'music/63.mp3': 147,  // 2 min e 27 secondi
-  'music/64.mp3': 130,  // 2 min e 10 secondi
-  'music/65.mp3': 186,  // 3 min e 06 secondi
-  'music/66.mp3': 203,  // 3 min e 23 secondi
-  'music/67.mp3': 203,  // 3 min e 23 secondi
-  'music/68.mp3': 168,  // 2 min e 48 secondi
-  'music/69.mp3': 147,  // 2 min e 27 secondi
-  'music/70.mp3': 167,  // 2 min e 47 secondi
-  'music/71.mp3': 177,  // 2 min e 57 secondi
-  'music/72.mp3': 217,  // 3 min e 37 secondi
-  'music/73.mp3': 226   // 3 min e 46 secondi
-    // ...aggiungi qui tutte le altre tracce...
+
+    // innocente 
+    'music/1.mp3': 119,   // 1 min e 59 secondi
+    'music/2.mp3': 232,   // 3 min e 52 secondi
+    'music/3.mp3': 194,   // 3 min e 14 secondi
+    'music/4.mp3': 144,   // 2 min e 24 secondi
+    'music/5.mp3': 186,   // 3 min e 06 secondi
+    'music/61.mp3': 176,  // 2 min e 56 secondi
+    'music/62.mp3': 183,  // 3 min e 03 secondi
+    'music/63.mp3': 147,  // 2 min e 27 secondi
+    'music/64.mp3': 130,  // 2 min e 10 secondi
+    'music/65.mp3': 186,  // 3 min e 06 secondi
+    'music/66.mp3': 203,  // 3 min e 23 secondi
+    'music/67.mp3': 203,  // 3 min e 23 secondi
+    'music/68.mp3': 168,  // 2 min e 48 secondi
+    'music/69.mp3': 147,  // 2 min e 27 secondi
+    'music/70.mp3': 167,  // 2 min e 47 secondi
+    'music/71.mp3': 177,  // 2 min e 57 secondi
+    'music/72.mp3': 217,  // 3 min e 37 secondi
+    'music/73.mp3': 226,  // 3 min e 46 secondi
+
+    // astroworld
+    'music/6.mp3': 191,   // BUTTERFLY EFFECT - Travis Scott (3:11)
+    'music/7.mp3': 313,   // Sicko Mode - Travis Scott (5:13)
+    'music/8.mp3': 146,   // Skeletons - Travis Scott (2:26)
+    'music/9.mp3': 196,   // 5% TINT - Travis Scott (3:16)
+    'music/10.mp3': 191,  // ZEZE - Travis Scott (3:11)
+    'music/74.mp3': 271,  // STARGAZING - Travis Scott (4:31)
+    'music/75.mp3': 180,  // CAROUSEL (Ft. Frank Ocean) - Travis Scott (3:00)
+    'music/76.mp3': 186,  // R.I.P. SCREW (Ft. Swae Lee) - Travis Scott (3:06)
+    'music/77.mp3': 338,  // STOP TRYING TO BE GOD (Ft. James Blake, Kid Cudi & Philip Bailey) - Travis Scott (5:38)
+    'music/78.mp3': 218,  // NO BYSTANDERS (Ft. Juice WRLD & Sheck Wes) - Travis Scott (3:38)
+    'music/79.mp3': 232,  // WAKE UP (Ft. The Weeknd) - Travis Scott (3:52)
+    'music/80.mp3': 157,  // NC-17 (Ft. 21 Savage) - Travis Scott (2:37)
+    'music/81.mp3': 143,  // ASTROTHUNDER - Travis Scott (2:23)
+    'music/82.mp3': 150,  // YOSEMITE (Ft. Gunna & NAV) - Travis Scott (2:30)
+    'music/83.mp3': 198,  // CAN'T SAY (Ft. Don Toliver) - Travis Scott (3:18)
+    'music/84.mp3': 177,  // WHO? WHAT! (Ft. Quavo & Takeoff) - Travis Scott (2:57)
+    'music/85.mp3': 218,  // HOUSTONFORNICATION - Travis Scott (3:38)
+    'music/86.mp3': 209,  // COFFEE BEAN - Travis Scott (3:29)
+
+    // The Globe - Kid Yugi
+    'music/11.mp3': 212,  // DEM - Kid Yugi (ft. Artie 5ive & Tony Boy) 3:32
+    'music/12.mp3': 185,  // GRAMMELOT - Kid Yugi 3:05
+    'music/13.mp3': 191,  // Il Ferro di Čechov - Kid Yugi 3:11
+    'music/14.mp3': 146,  // Il Filmografo - Kid Yugi 2:26
+    'music/15.mp3': 117,  // Yung 3P 3 - Kid Yugi 1:57
+    'music/93.mp3': 116,  // Hybris - Kid Yugi 1:56
+    'music/94.mp3': 180,  // Kabuki - Kid Yugi 3:00
+    'music/95.mp3': 175,  // No Gimmick - Kid Yugi 2:55
+    'music/96.mp3': 207,  // Sturm und drang - Kid Yugi 3:27
+    'music/97.mp3': 145,  // Back n' Forth (ft. Kira) - Kid Yugi 2:25
+    'music/98.mp3': 151,  // King Lear (ft. Sosa Priority) - Kid Yugi 2:31
+    'music/99.mp3': 182,  // Paradise Now - Kid Yugi 3:02
+
+    // Sfera Ebbasta
+    'music/16.mp3': 185,  // Ricchi x Sempre - Sfera Ebbasta (3:05)
+    'music/17.mp3': 205,  // Sciroppo (ft. DrefGold) - Sfera Ebbasta (3:25)
+    'music/18.mp3': 185,  // Tran Tran - Sfera Ebbasta (3:05)
+    'music/19.mp3': 189,  // Bancomat - Sfera Ebbasta (3:09)
+    'music/20.mp3': 200,  // Serpenti a Sonagli - Sfera Ebbasta (3:20)
+    'music/87.mp3': 183,  // Uber - Sfera Ebbasta (3:03)
+    'music/88.mp3': 184,  // Leggenda - Sfera Ebbasta (3:04)
+    'music/89.mp3': 210,  // Rockstar - Sfera Ebbasta (3:30)
+    'music/90.mp3': 160,  // 20 Collane (ft. Rich The Kid) - Sfera Ebbasta (2:40)
+    'music/91.mp3': 210,  // Cupido (ft. Quavo) - Sfera Ebbasta (3:30)
+    'music/92.mp3': 143,  // XNX - Sfera Ebbasta (2:23)
+
+    // Baby Gang (Ep2)
+    'music/21.mp3': 182,  // Paranoia - Baby Gang (3:02)
+    'music/22.mp3': 166,  // Combattere - Baby Gang (2:46)
+    'music/23.mp3': 160,  // Carico - Baby Gang (2:40)
+    'music/24.mp3': 143,  // 2000 - Baby Gang (2:23)
+    'music/25.mp3': 144,  // Cella 3 - Baby Gang (2:24)
+    'music/26.mp3': 217,  // Mentalité - Baby Gang (3:37)
+    'music/27.mp3': 212,  // Lei - Baby Gang (3:32)
+    'music/28.mp3': 169,  // Mamacita - Baby Gang (2:49)
 };
 
 function initializeSearch() {
@@ -466,7 +524,7 @@ function initializeSearch() {
             albums.forEach(album => {
                 const title = album.querySelector('h3').textContent.toLowerCase();
                 const artist = album.dataset.artist.toLowerCase();
-                
+
                 if (title.includes(searchTerm) || artist.includes(searchTerm)) {
                     results.push({
                         type: 'album',
@@ -511,11 +569,11 @@ function displaySearchResults(results, container) {
     }
 
     container.style.display = 'block';
-    
+
     results.forEach(result => {
         const resultElement = document.createElement('div');
         resultElement.className = 'search-result';
-        
+
         if (result.type === 'album') {
             resultElement.innerHTML = `
                 <img src="${result.cover}" alt="Album cover" style="width: 50px; height: 50px; object-fit: cover;">
@@ -539,7 +597,7 @@ function displaySearchResults(results, container) {
         resultElement.addEventListener('click', () => {
             const listenNowButton = result.element.querySelector('.listen-now');
             const searchBar = document.getElementById('search-bar'); // Aggiungi questa riga
-            
+
             if (result.type === 'album') {
                 listenNowButton.click();
             } else {
@@ -548,7 +606,7 @@ function displaySearchResults(results, container) {
                     playSong(result.songIndex);
                 }, 100);
             }
-            
+
             // Resetta il campo di ricerca e nascondi i risultati
             searchBar.value = '';
             container.style.display = 'none';
@@ -568,17 +626,17 @@ function initializeStars() {
     for (let i = 0; i < numberOfStars; i++) {
         const star = document.createElement('div');
         star.className = 'star';
-        
+
         // Posizione casuale
         const x = Math.random() * 100;
         const y = Math.random() * 300;
-        
+
         // Dimensione più piccola per stelle più realistiche
         const size = 0.3 + Math.random() * maxSize;
-        
+
         // Brillio più lento
         const twinkleDuration = 8 + Math.random() * 12; // 8-20 secondi per brillio
-        
+
         star.style.cssText = `
             left: ${x}%;
             top: ${y}%;
@@ -591,7 +649,7 @@ function initializeStars() {
             position: absolute;
             border-radius: 50%;
         `;
-        
+
         starsContainer.appendChild(star);
     }
 
@@ -600,11 +658,11 @@ function initializeStars() {
     function moveStars() {
         scrollPosition += 0.01; // Drasticamente ridotta la velocità base
         const stars = document.querySelectorAll('.star');
-        
+
         stars.forEach((star, index) => {
             const speed = 0.02 + (index % 5) * 0.005; // Velocità molto ridotta con più variazione
             const y = parseFloat(star.style.top) + speed;
-            
+
             if (y > 300) {
                 star.style.top = '-5%';
             } else {
@@ -621,7 +679,7 @@ function initializeStars() {
 function findNextAlbumCard() {
     const albumCards = document.querySelectorAll('.album-card');
     let currentAlbumCard = null;
-    
+
     // Find current album card
     for (let i = 0; i < albumCards.length; i++) {
         if (albumCards[i].querySelector('img')?.src === currentAlbumCoverSrc) {
@@ -635,6 +693,6 @@ function findNextAlbumCard() {
         const nextIndex = (currentIndex + 1) % albumCards.length;
         return albumCards[nextIndex];
     }
-    
+
     return null;
 }
