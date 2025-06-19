@@ -36,6 +36,29 @@
     </div>
 </div>
 
+<div class="playlist-main-section">
+    <div class="user-playlist-section">
+        <div class="playlist-header">
+            <h2>La tua playlist</h2>
+            <div class="playlist-header-btns">
+                <button id="play-playlist-btn" class="play-playlist-btn" title="Riproduci tutta la playlist"><i class="bi bi-play-circle-fill"></i> Play Playlist</button>
+                <button id="open-overlay-btn" class="add-main-btn" title="Aggiungi canzoni"><i class="bi bi-plus-circle"></i></button>
+            </div>
+        </div>
+        <ul id="user-playlist-list" class="song-list"></ul>
+    </div>
+</div>
+
+<!-- Overlay per aggiunta canzoni -->
+<div id="add-songs-overlay" class="add-songs-overlay">
+    <div class="overlay-content">
+        <button id="close-overlay-btn" class="close-overlay-btn" title="Chiudi"><i class="bi bi-x-lg"></i></button>
+        <h2>Aggiungi canzoni</h2>
+        <ul id="overlay-discover-list" class="song-list"></ul>
+        <audio id="overlay-audio-player" controls style="width:100%;margin-top:18px;display:none;"></audio>
+    </div>
+</div>
+
 <footer class="footer">
     <p>© 2024 Minerify - Tutti i diritti riservati</p>
 </footer>

@@ -837,3 +837,248 @@ button:hover {
     background: transparent !important;
     transform: scale(1.15);
 }
+
+.playlist-feature-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 40px;
+    margin: 40px 0;
+}
+
+.discover-songs-section, .user-playlist-section {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 24px 18px 18px 18px;
+    min-width: 320px;
+    max-width: 420px;
+    flex: 1 1 350px;
+    box-shadow: 0 2px 16px 0 rgba(0,122,204,0.08);
+}
+
+.song-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.song-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0,122,204,0.10);
+    border-radius: 7px;
+    margin-bottom: 10px;
+    padding: 10px 16px;
+    font-size: 1.1em;
+    transition: background 0.2s;
+}
+
+.song-list li:hover {
+    background: rgba(0,122,204,0.18);
+}
+
+.song-title {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.song-artist {
+    color: #7fd0ff;
+    font-size: 0.98em;
+    margin-right: 18px;
+}
+
+.add-song-btn, .remove-song-btn {
+    background: none;
+    border: none;
+    color: #00c6ff;
+    font-size: 1.5em;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+
+.add-song-btn:hover {
+    color: #007acc;
+}
+
+.remove-song-btn {
+    color: #ff5c5c;
+    font-size: 1.3em;
+}
+
+.remove-song-btn:hover {
+    color: #ff0000;
+}
+
+.save-playlist-btn {
+    margin-top: 18px;
+    padding: 10px 30px;
+    background: linear-gradient(90deg, #007acc 0%, #00c6ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px 0 rgba(0,198,255,0.10);
+}
+
+.save-playlist-btn:hover {
+    background: linear-gradient(90deg, #00c6ff 0%, #007acc 100%);
+    transform: scale(1.04);
+}
+
+.playlist-main-section {
+    display: flex;
+    justify-content: center;
+    margin: 40px 0 0 0;
+}
+
+.user-playlist-section {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 24px 18px 18px 18px;
+    min-width: 320px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 2px 16px 0 rgba(0,122,204,0.08);
+}
+
+.playlist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.playlist-header-btns {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.add-main-btn {
+    font-size: 2.2em;
+    color: #00c6ff;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 18px;
+    transition: color 0.2s, transform 0.2s;
+}
+.add-main-btn:hover {
+    color: #007acc;
+    transform: scale(1.12);
+}
+
+.add-songs-overlay {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.75);
+    justify-content: center;
+    align-items: center;
+}
+.add-songs-overlay.active {
+    display: flex;
+}
+.overlay-content {
+    background: #181c22;
+    border-radius: 18px;
+    padding: 36px 28px 28px 28px;
+    min-width: 340px;
+    max-width: 480px;
+    width: 90vw;
+    box-shadow: 0 4px 32px 0 rgba(0,198,255,0.18);
+    position: relative;
+    animation: fadeIn 0.2s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+.close-overlay-btn {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.6em;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.close-overlay-btn:hover {
+    color: #ff5c5c;
+}
+#overlay-discover-list .song-title {
+    font-weight: bold;
+    margin-right: 10px;
+}
+#overlay-discover-list .song-artist {
+    color: #7fd0ff;
+    font-size: 0.98em;
+    margin-right: 18px;
+}
+.overlay-song-btn {
+    background: none;
+    border: none;
+    color: #00c6ff;
+    font-size: 1.4em;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+.overlay-song-btn[disabled] {
+    color: #888;
+    cursor: not-allowed;
+}
+.overlay-song-btn.play {
+    color: #7fd0ff;
+    font-size: 1.3em;
+}
+.overlay-song-btn.play.active {
+    color: #00ffb3;
+}
+.overlay-song-btn.add:hover {
+    color: #007acc;
+}
+.overlay-song-btn.play:hover {
+    color: #00ffb3;
+}
+#overlay-audio-player {
+    background: #222;
+    border-radius: 8px;
+    margin-top: 18px;
+}
+
+.play-playlist-btn {
+    font-size: 1.5em;
+    color: #fff;
+    background: linear-gradient(90deg, #00c6ff 0%, #007acc 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 14px 36px;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-bottom: 10px;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 24px 0 rgba(0, 198, 255, 0.18);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+.play-playlist-btn i {
+    font-size: 1.3em;
+    margin-right: 6px;
+}
+.play-playlist-btn:hover {
+    background: linear-gradient(90deg, #007acc 0%, #00c6ff 100%);
+    transform: scale(1.07);
+    box-shadow: 0 8px 32px 0 rgba(0, 198, 255, 0.28);
+}

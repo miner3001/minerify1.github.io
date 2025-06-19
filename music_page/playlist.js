@@ -15,10 +15,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const audioPlayer = document.getElementById('audio-player');
     const songList = document.getElementById('song-list');
 
+    // --- Overlay e gestione playlist ---
+    const userPlaylistList = document.getElementById('user-playlist-list');
+    const openOverlayBtn = document.getElementById('open-overlay-btn');
+    const addSongsOverlay = document.getElementById('add-songs-overlay');
+    const closeOverlayBtn = document.getElementById('close-overlay-btn');
+    const overlayDiscoverList = document.getElementById('overlay-discover-list');
+    const overlayAudioPlayer = document.getElementById('overlay-audio-player');
+
     // Variabili di stato
     let isPlaying = false;
     let currentFavoriteIndex = 0;
     let likedSongs = JSON.parse(localStorage.getItem('likedSongs')) || [];
+
+    // Carica playlist utente da localStorage
+    let userPlaylist = JSON.parse(localStorage.getItem('userPlaylist')) || [];
+
+    // Carica canzoni disponibili da localStorage (chiave: discoverSongsData)
+    let discoverSongs = [];
+    try {
+        discoverSongs = JSON.parse(localStorage.getItem('discoverSongsData')) || [];
+    } catch (e) {
+        discoverSongs = [];
+    }
 
     // Funzione per salvare i preferiti nel localStorage
     function saveFavorites() {
@@ -230,4 +249,202 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Inizializza la searchbar
     initializeSearch();
+
+    // --- Funzionalità Creazione Playlist ---
+    // Dati di esempio per le canzoni disponibili (simulazione dati da "scopri")
+    const discoverSongsData = [
+        { id: 1, title: 'Bentley', artist: 'Baby Gang' },
+        { id: 2, title: 'Libertad', artist: 'Baby Gang' },
+        { id: 3, title: 'BUTTERFLY EFFECT', artist: 'Travis Scott' },
+        { id: 4, title: 'Sicko Mode', artist: 'Travis Scott' },
+        { id: 5, title: 'GRAMMELOT', artist: 'Kid Yugi' },
+        { id: 6, title: 'Ricchi x Sempre', artist: 'Sfera Ebbasta' },
+        { id: 7, title: 'Paranoia', artist: 'Baby Gang' },
+        { id: 8, title: 'HYAENA', artist: 'Travis Scott' },
+        { id: 9, title: '20', artist: 'Capo Plaza' },
+        { id: 10, title: 'L’Anticristo', artist: 'Kid Yugi' }
+        // ...puoi aggiungere altri titoli qui
+    ];
+
+    // Salva i dati delle canzoni scoperte nel localStorage
+    function saveDiscoverSongsData() {
+        localStorage.setItem('discoverSongsData', JSON.stringify(discoverSongsData));
+    }
+
+    // Inizializza la lista delle canzoni scoperte (solo se non esiste già)
+    function initializeDiscoverSongs() {
+        discoverSongs.length = 0;
+        if (!localStorage.getItem('discoverSongsData')) {
+            discoverSongsData.forEach(song => {
+                discoverSongs.push(song);
+            });
+            saveDiscoverSongsData();
+        } else {
+            try {
+                const savedSongs = JSON.parse(localStorage.getItem('discoverSongsData')) || [];
+                savedSongs.forEach(song => {
+                    discoverSongs.push(song);
+                });
+            } catch (e) {
+                console.error('Errore nel parsing dei dati delle canzoni scoperte:', e);
+            }
+        }
+    }
+
+    // Chiama la funzione di inizializzazione
+    initializeDiscoverSongs();
+
+    // Renderizza la playlist utente all'avvio
+    renderUserPlaylist();
+
+    // --- Funzionalità playlist e overlay robusta con play playlist ---
+    function getUserPlaylist() {
+        try {
+            return JSON.parse(localStorage.getItem('userPlaylist')) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+    function setUserPlaylist(playlist) {
+        localStorage.setItem('userPlaylist', JSON.stringify(playlist));
+    }
+    function getDiscoverSongs() {
+        try {
+            return JSON.parse(localStorage.getItem('discoverSongsData')) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    let playlistCurrentIndex = null;
+    let playlistIsPlaying = false;
+
+    function renderUserPlaylist(activeIdx = null) {
+        userPlaylist = getUserPlaylist();
+        userPlaylistList.innerHTML = '';
+        userPlaylist.forEach((song, idx) => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="song-title">${song.title}</span>
+                <span class="song-artist">${song.artist}</span>
+                <button class="remove-song-btn" title="Rimuovi dalla playlist"><i class="bi bi-x-circle"></i></button>
+            `;
+            if (activeIdx !== null && idx === activeIdx) {
+                li.classList.add('playing');
+            }
+            li.querySelector('.remove-song-btn').addEventListener('click', () => {
+                userPlaylist.splice(idx, 1);
+                setUserPlaylist(userPlaylist);
+                renderUserPlaylist(playlistIsPlaying ? playlistCurrentIndex : null);
+            });
+            userPlaylistList.appendChild(li);
+        });
+    }
+
+    function renderOverlayDiscoverSongs() {
+        const discoverSongs = getDiscoverSongs();
+        userPlaylist = getUserPlaylist();
+        overlayDiscoverList.innerHTML = '';
+        discoverSongs.forEach(song => {
+            const inPlaylist = userPlaylist.some(s => s.id === song.id);
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <span class="song-title">${song.title}</span>
+                <span class="song-artist">${song.artist}</span>
+                <button class="overlay-song-btn play" title="Ascolta"><i class="bi bi-play-circle"></i></button>
+                <button class="overlay-song-btn add" title="Aggiungi alla playlist" ${inPlaylist ? 'disabled' : ''}><i class="bi bi-plus-circle"></i></button>
+            `;
+            // Play
+            const playBtn = li.querySelector('.play');
+            playBtn.addEventListener('click', () => {
+                if (song.audioUrl) {
+                    // Ferma qualsiasi altra riproduzione
+                    overlayAudioPlayer.pause();
+                    overlayAudioPlayer.currentTime = 0;
+                    overlayAudioPlayer.src = song.audioUrl;
+                    overlayAudioPlayer.style.display = 'block';
+                    overlayAudioPlayer.play();
+                    document.querySelectorAll('.overlay-song-btn.play').forEach(btn => btn.classList.remove('active'));
+                    playBtn.classList.add('active');
+                }
+            });
+            // Aggiungi
+            li.querySelector('.add').addEventListener('click', () => {
+                if (!userPlaylist.some(s => s.id === song.id)) {
+                    userPlaylist.push(song);
+                    setUserPlaylist(userPlaylist);
+                    renderUserPlaylist(playlistIsPlaying ? playlistCurrentIndex : null);
+                    renderOverlayDiscoverSongs();
+                }
+            });
+            overlayDiscoverList.appendChild(li);
+        });
+    }
+
+    openOverlayBtn.addEventListener('click', () => {
+        addSongsOverlay.classList.add('active');
+        renderOverlayDiscoverSongs();
+        overlayAudioPlayer.pause();
+        overlayAudioPlayer.style.display = 'none';
+        overlayAudioPlayer.src = '';
+    });
+    closeOverlayBtn.addEventListener('click', () => {
+        addSongsOverlay.classList.remove('active');
+        overlayAudioPlayer.pause();
+        overlayAudioPlayer.style.display = 'none';
+        overlayAudioPlayer.src = '';
+        document.querySelectorAll('.overlay-song-btn.play').forEach(btn => btn.classList.remove('active'));
+    });
+
+    // --- Play Playlist ---
+    const playPlaylistBtn = document.getElementById('play-playlist-btn');
+    playPlaylistBtn.addEventListener('click', () => {
+        userPlaylist = getUserPlaylist();
+        if (userPlaylist.length === 0) return;
+        playlistCurrentIndex = 0;
+        playlistIsPlaying = true;
+        playPlaylistSong(playlistCurrentIndex);
+    });
+
+    function playPlaylistSong(idx) {
+        userPlaylist = getUserPlaylist();
+        const song = userPlaylist[idx];
+        if (!song) return;
+        // Usa audioUrl se presente, altrimenti src
+        const url = song.audioUrl || song.src;
+        if (!url) return;
+        audioPlayer.src = url;
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+        currentSong.textContent = song.title || song.name || 'Canzone';
+        if (song.cover) currentAlbumCover.src = song.cover;
+        playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
+        isPlaying = true;
+        updateLikeButton && updateLikeButton();
+        savePlayerState && savePlayerState();
+        renderUserPlaylist(idx);
+        // Avanza alla prossima canzone al termine
+        audioPlayer.onended = () => {
+            if (playlistIsPlaying && playlistCurrentIndex !== null) {
+                playlistCurrentIndex++;
+                if (playlistCurrentIndex < userPlaylist.length) {
+                    playPlaylistSong(playlistCurrentIndex);
+                } else {
+                    playlistIsPlaying = false;
+                    playlistCurrentIndex = null;
+                    renderUserPlaylist();
+                }
+            }
+        };
+    }
+    // Ferma la sequenza se l'utente interagisce con il player
+    [playPauseButton, prevSongButton, nextSongButton].forEach(btn => {
+        btn.addEventListener('click', () => {
+            playlistIsPlaying = false;
+            playlistCurrentIndex = null;
+            renderUserPlaylist();
+        });
+    });
+    // All'avvio
+    renderUserPlaylist();
 });
