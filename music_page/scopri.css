@@ -15,7 +15,7 @@ body {
     scrollbar-width: none; /* Nasconde la scrollbar in Firefox */
     -ms-overflow-style: none; /* Nasconde la scrollbar in IE/Edge */
     width: 100%;
-    height: 100vh; /* Imposta l'altezza al 100% della viewport */
+    min-height: 100vh; /* Cambiato da height a min-height per permettere il contenuto di espandersi */
     position: relative; /* Necessario per posizionare gli elementi figli */
     
     
@@ -70,10 +70,8 @@ header h1 {
     box-sizing: border-box;
     transition: margin-top 0.3s;
     margin-top: 10px; /* Riduce lo spazio iniziale sopra il testo "Scopri nuova musica" */
-    height: calc(100vh - 180px); /* Altezza calcolata per evitare sovrapposizioni con la playbar */
-    overflow-y: auto; /* Permette lo scroll solo del contenuto */
-    scrollbar-width: none; /* Nasconde la scrollbar in Firefox */
-    -ms-overflow-style: none; /* Nasconde la scrollbar in IE/Edge */
+    padding-bottom: 120px; /* Aggiunge spazio in fondo per la playbar */
+    overflow-y: visible; /* Rimuove il controllo scroll dal container */
 }
 
 .discover-section.hidden {
