@@ -250,7 +250,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentAlbumSongs = albumSrcs;
                 currentAlbumNames = albumSongs;
                 currentAlbumCoverSrc = albumCover;
-                playSong(index); // Riproduce la canzone cliccata
+                // Trova l'oggetto canzone completo da allSongsData usando src
+                const songObjectToPlay = allSongsData.find(songObj => songObj.src === albumSrcs[index]);
+                if (songObjectToPlay) {
+                    currentSongIndex = allSongsData.indexOf(songObjectToPlay);
+                    playSong(songObjectToPlay);
+                }
             });
         });
 
@@ -264,8 +269,13 @@ document.addEventListener('DOMContentLoaded', function () {
             currentAlbumNames = button.getAttribute('data-names').split(',');
             const albumCard = button.closest('.album-card');
             currentAlbumCoverSrc = albumCard.querySelector('img').src;
-
-            playSong(0); // Riproduce la prima canzone dell'album
+            // Trova la prima canzone dell'album come oggetto
+            const firstSongSrc = currentAlbumSongs[0];
+            const songObjectToPlay = allSongsData.find(songObj => songObj.src === firstSongSrc);
+            if (songObjectToPlay) {
+                currentSongIndex = allSongsData.indexOf(songObjectToPlay);
+                playSong(songObjectToPlay);
+            }
         });
     });
 
@@ -747,6 +757,7 @@ function initializeSearch() {
                 const listenNowButton = album.querySelector('.listen-now');
                 if (listenNowButton) {
                     const songs = listenNowButton.getAttribute('data-names')?.split(',') || [];
+                    const srcs = listenNowButton.getAttribute('data-src')?.split(',') || [];
                     songs.forEach((song, index) => {
                         if (song.toLowerCase().includes(searchTerm)) {
                             results.push({
@@ -756,7 +767,8 @@ function initializeSearch() {
                                 artist: artist,
                                 cover: album.querySelector('img').src,
                                 albumTitle: title,
-                                songIndex: index
+                                songIndex: index,
+                                src: srcs[index] ? srcs[index].trim() : undefined
                             });
                         }
                     });
@@ -803,15 +815,18 @@ function displaySearchResults(results, container) {
 
         resultElement.addEventListener('click', () => {
             const listenNowButton = result.element.querySelector('.listen-now');
-            const searchBar = document.getElementById('search-bar'); // Aggiungi questa riga
+            const searchBar = document.getElementById('search-bar');
 
             if (result.type === 'album') {
                 listenNowButton.click();
             } else {
-                listenNowButton.click();
-                setTimeout(() => {
-                    playSong(result.songIndex);
-                }, 100);
+                // Trova l'oggetto canzone completo da allSongsData usando result.src
+                const songObjectToPlay = allSongsData.find(songObj => songObj.src === result.src);
+                if (songObjectToPlay) {
+                    setCurrentAlbumContextFromSong(songObjectToPlay);
+                    currentSongIndex = allSongsData.indexOf(songObjectToPlay);
+                    playSong(songObjectToPlay);
+                }
             }
 
             // Resetta il campo di ricerca e nascondi i risultati
