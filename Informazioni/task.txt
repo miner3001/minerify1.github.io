@@ -1,1 +1,28 @@
-Creazione Playlist dentro libreria 
+1. Funzionalità Principali
+Creazione Playlist:
+Implementare la creazione di playlist all'interno della libreria musicale.
+
+Riparazione Player:
+Risolvere i problemi del player all'interno delle playlist.
+
+Suggerimento:
+Utilizzare Copilot per l'assistenza al debug e all'implementazione.
+
+2. Debug e Ottimizzazione
+Bug "Innocente" vs "Astroworld":
+Indagare e correggere il bug specifico tra le tracce/album "Innocente" e "Astroworld".
+
+Bug Generici:
+Eseguire un controllo approfondito per identificare e risolvere eventuali altri bug presenti nell'applicazione.
+
+Spazio UI "Scopri":
+Eliminare lo spazio indesiderato tra la barra di ricerca e la dicitura "Scopri nuova musica" nella sezione "Scopri".
+
+3. Gestione Contenuti e Dati
+Sezione "Informazioni" - Dettagli Musica:
+
+Aggiungere una sottosezione/tabella "Musica" all'interno della sezione "Informazioni".
+Includere un riferimento al file album.txt.
+Creare un nuovo file canzoni.txt contenente l'elenco completo di tutte le 212 canzoni.
+Archiviazione Canzoni:
+Trovare e implementare un metodo per spostare le canzoni dal sito web a Google Drive (o un servizio di cloud storage simile) per una migliore gestione e distribuzione.
