@@ -166,6 +166,29 @@ header h1 {
     box-shadow: 0 0 15px rgba(0, 122, 204, 0.5);
 }
 
+.listen-now-main {
+    background-color: rgba(0, 122, 204, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: white;
+    border: 1px solid rgba(0, 122, 204, 0.3);
+    padding: 18px 40px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 18px;
+    font-size: 1.5em;
+    box-shadow: none;
+    display: inline-block;
+}
+
+.listen-now-main:hover {
+    background-color: rgba(0, 122, 204, 0.4);
+    border-color: rgba(0, 122, 204, 0.8);
+    box-shadow: 0 0 15px rgba(0, 122, 204, 0.5);
+    transform: none;
+}
+
 .footer {
     background-color: rgba(0, 0, 0, 0.5);
     color: #aaa;

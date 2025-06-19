@@ -265,6 +265,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // Listener per i pulsanti "Ascolta ora"
     listenNowButtons.forEach(button => {
         button.addEventListener('click', function () {
+            // Se il pulsante NON ha attributi data-src/data-names (quello in alto)
+            if (!button.hasAttribute('data-src') && !button.hasAttribute('data-names')) {
+                // Scegli una canzone casuale da allSongsData
+                if (allSongsData.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * allSongsData.length);
+                    const songObjectToPlay = allSongsData[randomIndex];
+                    currentSongIndex = allSongsData.indexOf(songObjectToPlay);
+                    playSong(songObjectToPlay);
+                }
+                return;
+            }
             currentAlbumSongs = button.getAttribute('data-src').split(',');
             currentAlbumNames = button.getAttribute('data-names').split(',');
             const albumCard = button.closest('.album-card');
