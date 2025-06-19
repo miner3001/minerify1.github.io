@@ -69,24 +69,14 @@
                 </section>
             </div>
         </div>
-    </main>
-
-    <div id="add-songs-overlay" class="add-songs-overlay">
+    </main>    <div id="add-songs-overlay" class="add-songs-overlay">
         <div class="overlay-content">
             <button id="close-overlay-btn" class="close-overlay-btn" title="Chiudi"><i class="bi bi-x-lg"></i></button>
-            <h2>Aggiungi Canzoni</h2>
             <div class="overlay-search-container">
-                <input type="text" id="overlay-search-bar" placeholder="Cerca tra tutte le canzoni...">
+                <input type="text" id="overlay-search-bar" placeholder="Cerca tra tutte le canzoni disponibili...">
             </div>
-            <div class="overlay-discover-list-wrapper">
-                <ul id="overlay-discover-list" class="song-list">
-                    <li class="table-header">
-                        <span>Titolo</span>
-                        <span>Artista</span>
-                        <span class="actions-header">Azioni</span>
-                    </li>
-                    <p class="empty-message" id="overlay-empty-message" style="display: none;">Nessun risultato trovato.</p>
-                </ul>
+            <div class="overlay-songs-grid" id="overlay-songs-grid">
+                <!-- Le canzoni verranno inserite qui dinamicamente -->
             </div>
             <audio id="overlay-audio-player" controls style="width: 100%; margin-top: 18px; display: none;"></audio>
         </div>

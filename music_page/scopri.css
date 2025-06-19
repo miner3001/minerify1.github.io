@@ -765,3 +765,26 @@ button:hover {
     background: transparent !important;
     transform: scale(1.15);
 }
+
+/*add to playlist button*/
+#add-to-playlist-button.add-to-playlist-button {
+    background: transparent !important;
+    border: none;
+    box-shadow: none;
+    color: #1db954;
+    font-size: 1.4em;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+    padding: 0 10px;
+}
+
+#add-to-playlist-button.add-to-playlist-button:hover {
+    color: #1ed760;
+    background: transparent !important;
+    transform: scale(1.15);
+}
+
+#add-to-playlist-button.add-to-playlist-button:active {
+    color: #17a74a;
+    transform: scale(1.05);
+}
