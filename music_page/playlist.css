@@ -109,158 +109,6 @@ header h1 {
     color: #007acc; /* Colore all'hover per i link di navigazione */
 }
 
-/* Search Bar Generale (non nell'overlay) */
-.search-container {
-    position: relative;
-    width: 80%;
-    max-width: 600px;
-    margin: 20px auto;
-    z-index: 100; /* Assicurati che sia sopra altri elementi */
-}
-
-#search-bar {
-    width: 100%;
-    padding: 12px 20px;
-    border-radius: 25px;
-    border: none;
-    background: rgba(34, 34, 34, 0.8);
-    color: white;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: background 0.3s, box-shadow 0.3s;
-}
-
-#search-bar:focus {
-    outline: none;
-    background: rgba(34, 34, 34, 0.95);
-    box-shadow: 0 0 10px rgba(0, 122, 204, 0.5);
-}
-
-.search-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-    border-radius: 12px;
-    max-height: 400px;
-    overflow-y: auto;
-    z-index: 100;
-    border: 1px solid #333;
-    display: none;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-}
-
-.search-category {
-    margin-bottom: 16px;
-}
-
-.search-category-title {
-    color: #007acc;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 12px 16px 8px;
-    margin: 0;
-    border-bottom: 1px solid #333;
-}
-
-.search-result-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 16px;
-    transition: background 0.2s ease;
-    cursor: pointer;
-}
-
-.search-result-item:hover {
-    background: rgba(0, 122, 204, 0.1);
-}
-
-.search-result-cover {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.search-result-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.search-result-title {
-    font-weight: 600;
-    font-size: 13px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.search-result-artist {
-    font-size: 11px;
-    color: #b3b3b3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.search-result-actions {
-    display: flex;
-    gap: 6px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.search-result-item:hover .search-result-actions {
-    opacity: 1;
-}
-
-.search-result-btn {
-    background: none;
-    border: none;
-    color: #b3b3b3;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-    font-size: 14px;
-}
-
-.search-result-btn:hover {
-    color: #007acc;
-    background: rgba(0, 122, 204, 0.1);
-}
-
-.no-results {
-    text-align: center;
-    color: #b3b3b3;
-    padding: 20px;
-    margin: 0;
-    font-style: italic;
-}
-
-/* Scrollbar per risultati ricerca */
-.search-results::-webkit-scrollbar {
-    width: 6px;
-}
-
-.search-results::-webkit-scrollbar-track {
-    background: #1a1a1a;
-    border-radius: 3px;
-}
-
-.search-results::-webkit-scrollbar-thumb {
-    background: #444;
-    border-radius: 3px;
-}
-
-.search-results::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
 /* Player Bar Styles */
 .player-bar {
     position: fixed;
@@ -724,9 +572,9 @@ header h1 {
     background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
     padding: 30px;
     border-radius: 15px;
-    width: 90%;
-    max-width: 900px;
-    max-height: 80vh;
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh;
     color: #fff;
     text-align: left;
     position: relative;
@@ -782,42 +630,38 @@ header h1 {
 
 .overlay-songs-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 15px;
-    max-height: 400px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    max-height: 500px;
     overflow-y: auto;
     padding-right: 10px;
 }
 
 .overlay-song-card {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     border-radius: 10px;
-    padding: 15px;
+    padding: 18px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    transition: all 0.3s ease;
+    gap: 15px;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
 }
 
 .overlay-song-card:hover {
-    background: rgba(0, 122, 204, 0.1);
-    transform: translateY(-2px);
+    background: rgba(0, 122, 204, 0.15);
     border-color: rgba(0, 122, 204, 0.3);
 }
 
 .overlay-song-card.added {
-    background: rgba(0, 122, 204, 0.2);
-    border-color: #007acc;
+    background: rgba(0, 122, 204, 0.25);
+    border-color: rgba(0, 122, 204, 0.5);
 }
 
-.overlay-song-card img {
-    width: 50px;
-    height: 50px;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
+.overlay-song-card.added:hover {
+    background: rgba(0, 122, 204, 0.3);
+    border-color: rgba(0, 122, 204, 0.6);
 }
 
 .overlay-song-info {
@@ -825,21 +669,36 @@ header h1 {
     min-width: 0;
 }
 
+.overlay-song-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
 .overlay-song-info .song-name {
     font-weight: 600;
     color: #fff;
-    margin-bottom: 4px;
-    white-space: nowrap;
+    margin-bottom: 6px;
+    font-size: 16px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .overlay-song-info .song-artist {
     color: #b3b3b3;
-    font-size: 13px;
-    white-space: nowrap;
+    font-size: 14px;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .overlay-add-btn {
@@ -851,13 +710,11 @@ header h1 {
     cursor: pointer;
     font-weight: 600;
     font-size: 12px;
-    transition: all 0.3s ease;
     flex-shrink: 0;
 }
 
 .overlay-add-btn:hover {
     background: linear-gradient(135deg, #0099ff, #007acc);
-    transform: scale(1.05);
 }
 
 .overlay-add-btn:disabled {
@@ -888,13 +745,31 @@ header h1 {
 /* Responsive per overlay */
 @media (max-width: 768px) {
     .overlay-content {
-        width: 95%;
+        width: 98%;
         padding: 20px;
-        max-height: 85vh;
+        max-height: 95vh;
     }
     
     .overlay-songs-grid {
         grid-template-columns: 1fr;
-        max-height: 350px;
+        max-height: 450px;
+        gap: 15px;
+    }
+    
+    .overlay-song-card {
+        padding: 15px;
+    }
+    
+    .overlay-song-card img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .overlay-song-info .song-name {
+        font-size: 15px;
+    }
+    
+    .overlay-song-info .song-artist {
+        font-size: 13px;
     }
 }

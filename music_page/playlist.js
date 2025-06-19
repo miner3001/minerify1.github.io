@@ -54,10 +54,6 @@ const searchInput = document.getElementById('overlay-search-bar');
 const overlaySongsGrid = document.getElementById('overlay-songs-grid');
 const playPlaylistBtn = document.getElementById('play-playlist-btn');
 
-// Elementi per la ricerca nella libreria
-const mainSearchBar = document.getElementById('search-bar');
-const mainSearchResults = document.getElementById('search-results');
-
 // Protezione: mostra errore chiaro se un elemento non esiste
 function checkDomElement(el, name) {
     if (!el) {
@@ -510,151 +506,8 @@ function displaySearchResults(query) {
                 showToast(`"${song.name}" aggiunta alla playlist!`);
             });
         }
-        
-        overlaySongsGrid.appendChild(songCard);
+          overlaySongsGrid.appendChild(songCard);
     });
-}
-
-// Funzione per la ricerca nella libreria
-function performLibrarySearch(query) {
-    const lowerCaseQuery = query.toLowerCase().trim();
-    
-    // Nascondi i risultati se la query è troppo corta
-    if (lowerCaseQuery.length < 1) {
-        mainSearchResults.style.display = 'none';
-        mainSearchResults.innerHTML = '';
-        return;
-    }
-
-    let searchResults = [];
-
-    // Cerca nei brani preferiti
-    likedSongs.forEach(song => {
-        if (song.name.toLowerCase().includes(lowerCaseQuery) || 
-            song.artist.toLowerCase().includes(lowerCaseQuery)) {
-            searchResults.push({
-                ...song,
-                type: 'liked',
-                category: 'Brani preferiti'
-            });
-        }
-    });
-
-    // Cerca nella mia playlist
-    myPlaylist.forEach(song => {
-        if (song.name.toLowerCase().includes(lowerCaseQuery) || 
-            song.artist.toLowerCase().includes(lowerCaseQuery)) {
-            searchResults.push({
-                ...song,
-                type: 'playlist',
-                category: 'La mia playlist'
-            });
-        }
-    });
-
-    // Cerca in tutte le canzoni disponibili
-    ALL_AVAILABLE_SONGS.forEach(song => {
-        if (song.name.toLowerCase().includes(lowerCaseQuery) || 
-            song.artist.toLowerCase().includes(lowerCaseQuery) ||
-            song.albumName.toLowerCase().includes(lowerCaseQuery)) {
-            // Evita duplicati
-            if (!searchResults.some(result => result.src === song.src)) {
-                searchResults.push({
-                    ...song,
-                    type: 'available',
-                    category: 'Tutte le canzoni'
-                });
-            }
-        }
-    });
-
-    displayLibrarySearchResults(searchResults);
-}
-
-function displayLibrarySearchResults(results) {
-    mainSearchResults.innerHTML = '';
-    
-    if (results.length === 0) {
-        mainSearchResults.innerHTML = '<p class="no-results">Nessun risultato trovato.</p>';
-        mainSearchResults.style.display = 'block';
-        return;
-    }
-
-    // Raggruppa per categoria
-    const groupedResults = {};
-    results.forEach(result => {
-        if (!groupedResults[result.category]) {
-            groupedResults[result.category] = [];
-        }
-        groupedResults[result.category].push(result);
-    });
-
-    // Crea HTML per ogni categoria
-    Object.keys(groupedResults).forEach(category => {
-        const categoryDiv = document.createElement('div');
-        categoryDiv.className = 'search-category';
-        
-        const categoryTitle = document.createElement('h3');
-        categoryTitle.className = 'search-category-title';
-        categoryTitle.textContent = category;
-        categoryDiv.appendChild(categoryTitle);
-
-        groupedResults[category].forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'search-result-item';
-            
-            resultItem.innerHTML = `
-                <img src="${result.cover}" alt="Cover" class="search-result-cover">
-                <div class="search-result-info">
-                    <div class="search-result-title">${result.name}</div>
-                    <div class="search-result-artist">${result.artist}</div>
-                </div>
-                <div class="search-result-actions">
-                    <button class="search-result-btn play-btn" title="Riproduci">
-                        <i class="bi bi-play-fill"></i>
-                    </button>
-                    ${result.type === 'available' ? 
-                        `<button class="search-result-btn add-btn" title="Aggiungi alla playlist">
-                            <i class="bi bi-plus-circle"></i>
-                        </button>` : ''
-                    }
-                </div>
-            `;
-
-            // Listener per riproduzione
-            resultItem.querySelector('.play-btn').addEventListener('click', () => {
-                if (result.type === 'liked') {
-                    currentPlaylist = [...likedSongs];
-                } else if (result.type === 'playlist') {
-                    currentPlaylist = [...myPlaylist];
-                } else {
-                    currentPlaylist = [result];
-                }
-                const songIndex = currentPlaylist.findIndex(s => s.src === result.src);
-                if (songIndex !== -1) {
-                    playSong(result, songIndex);
-                }
-                mainSearchResults.style.display = 'none';
-                mainSearchBar.value = '';
-            });
-
-            // Listener per aggiunta alla playlist (solo per canzoni disponibili)
-            const addBtn = resultItem.querySelector('.add-btn');
-            if (addBtn) {
-                addBtn.addEventListener('click', () => {
-                    addSongToMyPlaylist(result);
-                    mainSearchResults.style.display = 'none';
-                    mainSearchBar.value = '';
-                });
-            }
-
-            categoryDiv.appendChild(resultItem);
-        });
-
-        mainSearchResults.appendChild(categoryDiv);
-    });
-
-    mainSearchResults.style.display = 'block';
 }
 
 // --- DRAG AND DROP PER LA MIA PLAYLIST ---
@@ -673,28 +526,17 @@ function addDragAndDropListeners() {
 }
 
 function handleDragStart(e) {
-    draggedItem = this;
+    draggedItem = e.target.closest('.playlist-item');
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', this.innerHTML);
-    this.classList.add('dragging');
 }
 
 function handleDragOver(e) {
-    e.preventDefault(); // Necessario per permettere il drop
+    e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
-    const targetItem = this;
-    if (draggedItem !== targetItem) {
-        const targetRect = targetItem.getBoundingClientRect();
-        const mouseY = e.clientY;
-        const middleY = targetRect.top + targetRect.height / 2;
-
-        if (mouseY < middleY) {
-            targetItem.classList.remove('drag-after');
-            targetItem.classList.add('drag-before');
-        } else {
-            targetItem.classList.remove('drag-before');
-            targetItem.classList.add('drag-after');
-        }
+    
+    const targetItem = e.target.closest('.playlist-item');
+    if (targetItem && targetItem !== draggedItem) {
+        targetItem.style.borderTop = '2px solid #007acc';
     }
 }
 
@@ -759,21 +601,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (closeSearchOverlay) {
         closeSearchOverlay.addEventListener('click', closeAddSongSearch);
-    }
-    if (searchInput) {
+    }    if (searchInput) {
         searchInput.addEventListener('input', (e) => displaySearchResults(e.target.value));
-    }
-
-    // Listener per la ricerca nella libreria
-    if (mainSearchBar) {
-        mainSearchBar.addEventListener('input', (e) => performLibrarySearch(e.target.value));
-        
-        // Nascondi risultati quando si clicca fuori
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-container')) {
-                mainSearchResults.style.display = 'none';
-            }
-        });
     }
 
     // Quando l'overlay di ricerca si apre, mostra subito tutti i brani
@@ -787,21 +616,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Aggiorna il cuoricino all'avvio
     updateLikeButton();
-    
-    // Event listener per il pulsante Play Playlist
+      // Event listener per il pulsante Play Playlist
     if (playPlaylistBtn) {
+        console.log('Play Playlist button found, adding event listener');
         playPlaylistBtn.addEventListener('click', () => {
+            console.log('Play Playlist button clicked');
+            console.log('MyPlaylist length:', myPlaylist.length);
             if (myPlaylist.length > 0) {
                 // Imposta la playlist corrente sulla mia playlist
                 currentPlaylist = [...myPlaylist];
                 currentSongIndex = 0;
                 // Inizia a riprodurre la prima canzone della playlist
+                console.log('Playing first song:', myPlaylist[0]);
                 playSong(myPlaylist[0], 0);
                 showToast('Riproduzione playlist avviata!');
             } else {
+                console.log('Playlist is empty');
                 showToast('La playlist è vuota. Aggiungi delle canzoni per iniziare!');
             }
         });
+    } else {
+        console.error('Play Playlist button not found!');
     }
 
     console.log('Playlist page initialized successfully');
