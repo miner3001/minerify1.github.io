@@ -26,23 +26,17 @@ function initializeAllSongsData() {
         const artist = album.dataset.artist || '';
         const cover = album.querySelector('img')?.src || '';
         songSources.forEach((src, songIdx) => {
-            const duration = trackDurations[src.trim()] || 0;
             allSongsData.push({
                 src: src.trim(),
                 name: songNames[songIdx] ? songNames[songIdx].trim() : '',
                 albumName: albumTitle,
                 artist: artist,
                 cover: cover,
-                duration: duration,
                 originalAlbumIndex: albumIdx,
                 originalSongIndexInAlbum: songIdx
             });
         });
     });
-    
-    // Salva allSongsData nel localStorage per la pagina playlist
-    localStorage.setItem('allSongsDataStore', JSON.stringify(allSongsData));
-    console.log('All songs data saved to localStorage:', allSongsData.length, 'songs');
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -57,8 +51,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const currentSong = document.getElementById('current-song');
     const currentAlbumCover = document.getElementById('current-album-cover');
     const currentTime = document.getElementById('current-time');
-    const totalDuration = document.getElementById('total-duration');    const likeButton = document.getElementById('like-button');
-    const addToPlaylistButton = document.getElementById('add-to-playlist-button');
+    const totalDuration = document.getElementById('total-duration');
+    const likeButton = document.getElementById('like-button');
     const audioPlayer = document.getElementById('audio-player');
     const listenNowButtons = document.querySelectorAll('.listen-now');
 
@@ -135,16 +129,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Funzione per aggiornare la barra di progresso e il tempo
     function updateProgressBar() {
-        if (!isNaN(audioPlayer.duration)) {
+        if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
             const currentMinutes = Math.floor(audioPlayer.currentTime / 60);
             const currentSeconds = Math.floor(audioPlayer.currentTime % 60);
             const durationMinutes = Math.floor(audioPlayer.duration / 60);
             const durationSeconds = Math.floor(audioPlayer.duration % 60);
 
-            currentTime.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
-            totalDuration.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
-
-            progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            if (currentTime) {
+                currentTime.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
+            }
+            if (totalDuration) {
+                totalDuration.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
+            }
+            if (progressBar) {
+                progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            }
         }
     }
 
@@ -367,90 +366,47 @@ document.addEventListener('DOMContentLoaded', function () {
         updateLikeButton();
     });
 
-    // Funzioni per gestire la playlist
-    function saveMyPlaylist() {
-        localStorage.setItem('myPlaylist', JSON.stringify(myPlaylist));
-    }
+    // Listener per aggiornare la barra di progresso e il tempo
+    audioPlayer.addEventListener('timeupdate', function() {
+        updateProgressBar();
+        savePlayerState();
+    });
 
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.textContent = message;
-        toast.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #1db954;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            z-index: 10000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            font-weight: 600;
-        `;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => toast.style.opacity = '1', 100);
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    function addSongToMyPlaylist(songData) {
-        let myPlaylist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
-        
-        if (!myPlaylist.some(song => song.src === songData.src)) {
-            myPlaylist.push(songData);
-            localStorage.setItem('myPlaylist', JSON.stringify(myPlaylist));
-            showToast(`"${songData.name}" aggiunta alla playlist!`);
-        } else {
-            showToast(`"${songData.name}" è già nella playlist.`);
-        }
-    }
-
-    // Listener per il pulsante "Aggiungi alla playlist"
-    addToPlaylistButton.addEventListener('click', function () {
-        if (!audioPlayer.src) {
-            showToast('Nessuna canzone in riproduzione da aggiungere.');
-            return;
-        }
-
-        // Trova la canzone corrente in allSongsData
-        const currentSongSrc = audioPlayer.src;
-        const currentSongData = allSongsData.find(song => currentSongSrc.includes(song.src));
-        
-        if (currentSongData) {
-            addSongToMyPlaylist(currentSongData);
-        } else {
-            // Fallback: crea oggetto canzone con dati disponibili
-            const songData = {
-                src: currentSongSrc.split('/').pop(), // Solo il nome del file
-                name: currentSong.textContent,
-                artist: currentArtist?.textContent || 'Artista Sconosciuto',
-                albumName: 'Album Sconosciuto',
-                cover: currentAlbumCover.src,
-                duration: audioPlayer.duration || 0
-            };
-            addSongToMyPlaylist(songData);
+    progressBar.addEventListener('input', function () {
+        if (!isNaN(audioPlayer.duration)) {
+            audioPlayer.currentTime = (progressBar.value / 100) * audioPlayer.duration;
         }
     });
 
-    // Funzione per aggiornare la barra di progresso e il tempo
-    function updateProgressBar() {
-        if (!isNaN(audioPlayer.duration)) {
-            const currentMinutes = Math.floor(audioPlayer.currentTime / 60);
-            const currentSeconds = Math.floor(audioPlayer.currentTime % 60);
-            const durationMinutes = Math.floor(audioPlayer.duration / 60);
-            const durationSeconds = Math.floor(audioPlayer.duration % 60);
-
-            currentTime.textContent = `${currentMinutes}:${currentSeconds < 10 ? '0' : ''}${currentSeconds}`;
-            totalDuration.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
-
-            progressBar.value = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-        }
+    // Aggiorna lo stato visivo dei pulsanti loop/shuffle
+    function updateShuffleLoopButtons() {
+        loopButton.classList.toggle('active', isLoop);
+        shuffleButton.classList.toggle('active', isShuffle);
     }
+
+    // Listener per il pulsante loop
+    loopButton.addEventListener('click', function () {
+        isLoop = !isLoop;
+        if (isLoop) {
+            isShuffle = false;
+            shuffleButton.classList.remove('active');
+        }
+        loopButton.classList.toggle('active', isLoop);
+        updateShuffleLoopButtons();
+        savePlayerState();
+    });
+
+    // Listener per il pulsante shuffle
+    shuffleButton.addEventListener('click', function () {
+        isShuffle = !isShuffle;
+        if (isShuffle) {
+            isLoop = false;
+            loopButton.classList.remove('active');
+        }
+        shuffleButton.classList.toggle('active', isShuffle);
+        updateShuffleLoopButtons();
+        savePlayerState();
+    });
 
     // Modifica il listener per la fine della canzone
     audioPlayer.addEventListener('ended', function () {
@@ -516,9 +472,11 @@ document.addEventListener('DOMContentLoaded', function () {
     restorePlayerState();
 
     // Salva lo stato ogni volta che cambia
-    audioPlayer.addEventListener('timeupdate', savePlayerState);
     audioPlayer.addEventListener('play', savePlayerState);
     audioPlayer.addEventListener('pause', savePlayerState);
+    audioPlayer.addEventListener('loadedmetadata', function() {
+        updateProgressBar();
+    });
 
     // Aggiorna il cuoricino all'avvio
     updateLikeButton();
@@ -1020,4 +978,5 @@ function setCurrentAlbumContextFromSong(songData) {
     currentAlbumNames = listenNowButton.getAttribute('data-names').split(',');
     currentAlbumCoverSrc = albumCard.querySelector('img').src;
     currentSongIndex = songData.originalSongIndexInAlbum;
+    
 }
