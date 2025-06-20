@@ -205,7 +205,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     currentSongIndex = 0;
 
                     // Riproduci la prima canzone del nuovo album
-                    playSong(0);
+                    const songSrc = currentAlbumSongs[0];
+                    const songObjectToPlay = allSongsData.find(songObj => songObj.src === songSrc);
+                    if (songObjectToPlay) {
+                        currentSongIndex = allSongsData.indexOf(songObjectToPlay);
+                        playSong(songObjectToPlay);
+                    }
 
                     // Salva lo stato per mantenere la coerenza
                     savePlayerState();
