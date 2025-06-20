@@ -64,12 +64,12 @@ header h1 {
 }
 
 .discover-section {
-    padding: 30px 20px;
+    padding: 0 20px 30px 20px;
     text-align: center;
     width: 100%;
     box-sizing: border-box;
     transition: margin-top 0.3s;
-    margin-top: 10px; /* Riduce lo spazio iniziale sopra il testo "Scopri nuova musica" */
+    margin-top: 0; /* Elimina lo spazio sopra il testo "Scopri nuova musica" */
     padding-bottom: 120px; /* Aggiunge spazio in fondo per la playbar */
     overflow-y: visible; /* Rimuove il controllo scroll dal container */
 }
@@ -769,7 +769,7 @@ button:hover {
     background: transparent !important;
     border: none;
     box-shadow: none;
-    color: #1db954;
+    color: #ffffff;
     font-size: 1.4em;
     cursor: pointer;
     transition: color 0.2s, transform 0.2s;
@@ -777,12 +777,12 @@ button:hover {
 }
 
 #add-to-playlist-button.add-to-playlist-button:hover {
-    color: #1ed760;
+    color: #007acc;
     background: transparent !important;
     transform: scale(1.15);
 }
 
 #add-to-playlist-button.add-to-playlist-button:active {
-    color: #17a74a;
+    color: #007acc;
     transform: scale(1.05);
 }

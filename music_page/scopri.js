@@ -985,3 +985,64 @@ function setCurrentAlbumContextFromSong(songData) {
     currentSongIndex = songData.originalSongIndexInAlbum;
     
 }
+
+// Gestione del pulsante "Aggiungi alla playlist"
+const addToPlaylistButton = document.getElementById('add-to-playlist-button');
+if (addToPlaylistButton) {
+    addToPlaylistButton.addEventListener('click', function() {
+        addCurrentSongToPlaylist();
+    });
+}
+
+// Funzione per aggiungere la canzone corrente alla playlist
+function addCurrentSongToPlaylist() {
+    if (!audioPlayer.src) {
+        alert('Nessuna canzone in riproduzione');
+        return;
+    }
+
+    // Recupera la playlist dal localStorage
+    let myPlaylist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
+    
+    // Controlla se la canzone è già nella playlist
+    const songAlreadyExists = myPlaylist.some(song => song.src === audioPlayer.src);
+    
+    if (songAlreadyExists) {
+        alert('Questa canzone è già nella tua playlist!');
+        return;
+    }
+
+    // Trova i dati della canzone corrente
+    const currentSongData = allSongsData.find(song => song.src === audioPlayer.src);
+    
+    if (currentSongData) {
+        // Aggiungi la canzone alla playlist
+        const songToAdd = {
+            src: currentSongData.src,
+            name: currentSongData.name,
+            artist: currentSongData.artist,
+            albumName: currentSongData.albumName,
+            cover: currentSongData.cover,
+            duration: audioPlayer.duration || 0
+        };
+        
+        myPlaylist.push(songToAdd);
+        
+        // Salva la playlist aggiornata nel localStorage
+        localStorage.setItem('myPlaylist', JSON.stringify(myPlaylist));
+        
+        // Mostra un feedback visivo
+        alert('Canzone aggiunta alla tua playlist!');
+        
+        // Effetto visivo sul pulsante
+        addToPlaylistButton.style.color = '#1ed760';
+        addToPlaylistButton.style.transform = 'scale(1.2)';
+        
+        setTimeout(() => {
+            addToPlaylistButton.style.color = '#1db954';
+            addToPlaylistButton.style.transform = 'scale(1)';
+        }, 300);
+    } else {
+        alert('Errore: impossibile trovare i dati della canzone');
+    }
+}
