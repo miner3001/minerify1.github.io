@@ -1,3 +1,100 @@
+// === SISTEMA DI LOGGING AVANZATO ===
+
+// Configurazione del logger
+const LOG_CONFIG = {
+    enabled: true,
+    showTimestamp: true,
+    showEventType: true,
+    logToConsole: true,
+    logToScreen: false // Cambia a true se vuoi vedere i log anche sullo schermo
+};
+
+// Tipi di eventi
+const EVENT_TYPES = {
+    AUDIO: '🎵',
+    UI: '🖱️',
+    API: '🌐',
+    LYRICS: '📝',
+    PLAYER: '⏯️',
+    SEARCH: '🔍',
+    ERROR: '❌',
+    SUCCESS: '✅',
+    INFO: 'ℹ️'
+};
+
+/**
+ * Funzione di logging universale
+ * @param {string} eventType - Tipo di evento (usa EVENT_TYPES)
+ * @param {string} message - Messaggio principale
+ * @param {any} data - Dati aggiuntivi (opzionale)
+ */
+function logEvent(eventType, message, data = null) {
+    if (!LOG_CONFIG.enabled) return;
+    
+    const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+    const icon = EVENT_TYPES[eventType] || 'ℹ️';
+    
+    let logMessage = `${icon} [${timestamp}] ${message}`;
+    
+    if (LOG_CONFIG.logToConsole) {
+        if (data) {
+            console.log(logMessage, data);
+        } else {
+            console.log(logMessage);
+        }
+    }
+    
+    if (LOG_CONFIG.logToScreen) {
+        displayLogOnScreen(logMessage, eventType);
+    }
+}
+
+/**
+ * Mostra i log sullo schermo (opzionale)
+ */
+function displayLogOnScreen(message, eventType) {
+    // Crea o trova il container dei log
+    let logContainer = document.getElementById('debug-log');
+    if (!logContainer) {
+        logContainer = document.createElement('div');
+        logContainer.id = 'debug-log';
+        logContainer.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            max-height: 400px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-family: monospace;
+            font-size: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-y: auto;
+            z-index: 20000;
+            border: 1px solid #333;
+        `;
+        document.body.appendChild(logContainer);
+    }
+    
+    const logEntry = document.createElement('div');
+    logEntry.textContent = message;
+    logEntry.style.marginBottom = '2px';
+    logEntry.style.color = eventType === 'ERROR' ? '#ff6b6b' : 
+                          eventType === 'SUCCESS' ? '#51cf66' :
+                          eventType === 'API' ? '#74c0fc' : '#fff';
+    
+    logContainer.appendChild(logEntry);
+    
+    // Mantieni solo gli ultimi 20 log
+    while (logContainer.children.length > 20) {
+        logContainer.removeChild(logContainer.firstChild);
+    }
+    
+    // Scroll automatico
+    logContainer.scrollTop = logContainer.scrollHeight;
+}
+
 "use strict";
 
 // Variabili di stato globali
@@ -15,6 +112,7 @@ const MAX_SHUFFLE_HISTORY = 20;
 
 // Inizializza allSongsData con tutte le canzoni di tutti gli album
 function initializeAllSongsData() {
+    logEvent('INFO', 'Inizializzazione dati canzoni...');
     allSongsData = [];
     const albumCards = document.querySelectorAll('.album-card');
     albumCards.forEach((album, albumIdx) => {
@@ -37,9 +135,13 @@ function initializeAllSongsData() {
             });
         });
     });
+    logEvent('SUCCESS', `Caricate ${allSongsData.length} canzoni da ${albumCards.length} album`);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    logEvent('INFO', '=== MINERIFY MUSIC PLAYER AVVIATO ===');
+    logEvent('INFO', 'DOM caricato completamente, inizializzazione in corso...');
+    
     // Elementi del DOM
     const playPauseButton = document.getElementById('play-pause');
     const prevSongButton = document.getElementById('prev-song');
@@ -55,6 +157,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const likeButton = document.getElementById('like-button');
     const audioPlayer = document.getElementById('audio-player');
     const listenNowButtons = document.querySelectorAll('.listen-now');
+
+    logEvent('SUCCESS', 'Elementi DOM trovati e caricati', {
+        playPauseButton: !!playPauseButton,
+        audioPlayer: !!audioPlayer,
+        listenNowButtons: listenNowButtons.length
+    });
 
     // Inizializza allSongsData
     initializeAllSongsData();
@@ -149,31 +257,58 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Funzione per riprodurre una canzone
     function playSong(songData) {
-        if (!songData) return;
+        if (!songData) {
+            logEvent('ERROR', 'Tentativo di riprodurre canzone senza dati');
+            return;
+        }
+        
+        logEvent('PLAYER', `Iniziando riproduzione: ${songData.name}`, {
+            artist: songData.artist,
+            album: songData.albumName,
+            src: songData.src
+        });
+        
         setCurrentAlbumContextFromSong(songData);
         audioPlayer.src = songData.src;
         currentSong.textContent = songData.name;
         if (typeof currentArtist !== 'undefined' && currentArtist) currentArtist.textContent = songData.artist;
         currentAlbumCover.src = songData.cover;
         document.getElementById('audio-loading').style.display = 'block';
+        
+        logEvent('AUDIO', 'Caricamento audio iniziato...');
+        
         audioPlayer.play().then(() => {
             isPlaying = true;
             playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             if (isShuffle) {
                 shuffleHistory.push(songData.src);
                 if (shuffleHistory.length > MAX_SHUFFLE_HISTORY) shuffleHistory.shift();
+                logEvent('PLAYER', 'Canzone aggiunta alla cronologia shuffle');
             }
             updateLikeButton();
             savePlayerState();
-        }).catch(() => {
+            
+            logEvent('SUCCESS', 'Riproduzione audio avviata con successo');
+            
+            // Aggiorna i testi se l'overlay è aperto
+            if (lyricsOverlay && lyricsOverlay.classList.contains('active')) {
+                logEvent('LYRICS', 'Aggiornamento testi per nuova canzone');
+                showCurrentLyrics();
+            }
+        }).catch((error) => {
             isPlaying = false;
             playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
+            logEvent('ERROR', 'Errore durante la riproduzione audio', error);
         });
+        
         audioPlayer.oncanplay = function() {
             document.getElementById('audio-loading').style.display = 'none';
+            logEvent('AUDIO', 'Audio pronto per la riproduzione');
         };
+        
         audioPlayer.onerror = function() {
             document.getElementById('audio-loading').style.display = 'none';
+            logEvent('ERROR', 'Errore di caricamento audio');
         };
     }
 
@@ -306,45 +441,60 @@ document.addEventListener('DOMContentLoaded', function () {
             audioPlayer.pause();
             playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
             isPlaying = false;
+            logEvent('PLAYER', 'Riproduzione messa in pausa');
         } else {
             audioPlayer.play();
             playPauseButton.innerHTML = '<i class="bi bi-pause-fill"></i>';
             isPlaying = true;
+            logEvent('PLAYER', 'Riproduzione ripresa');
         }
     });
 
     // Listener per il pulsante "Precedente"
     prevSongButton.addEventListener('click', function () {
+        logEvent('PLAYER', 'Pulsante canzone precedente premuto');
         if (isShuffle) {
             if (shuffleHistory.length > 1) {
                 shuffleHistory.pop(); // Rimuovi la canzone attuale
                 const prevSrc = shuffleHistory.pop();
                 const songObj = allSongsData.find(song => song.src === prevSrc);
-                if (songObj) playSong(songObj);
+                if (songObj) {
+                    logEvent('PLAYER', 'Riproduzione canzone precedente (shuffle)', { song: songObj.name });
+                    playSong(songObj);
+                }
             }
             return;
         }
         if (currentSongIndex > 0) {
             const songObj = allSongsData.find(song => song.src === currentAlbumSongs[currentSongIndex - 1]);
+            logEvent('PLAYER', 'Riproduzione canzone precedente', { song: songObj?.name });
             playSong(songObj);
+        } else {
+            logEvent('INFO', 'Già alla prima canzone, impossibile andare indietro');
         }
     });
 
     // Listener per il pulsante "Successivo"
     nextSongButton.addEventListener('click', function () {
+        logEvent('PLAYER', 'Pulsante canzone successiva premuto');
         if (isShuffle) {
             let nextIdx;
             do {
                 nextIdx = Math.floor(Math.random() * allSongsData.length);
             } while (allSongsData.length > 1 && allSongsData[nextIdx].src === audioPlayer.src);
             const songObj = allSongsData[nextIdx];
+            logEvent('PLAYER', 'Riproduzione canzone casuale (shuffle)', { song: songObj.name });
             playSong(songObj);
         } else if (currentSongIndex < currentAlbumSongs.length - 1) {
             const songObj = allSongsData.find(song => song.src === currentAlbumSongs[currentSongIndex + 1]);
+            logEvent('PLAYER', 'Riproduzione canzone successiva', { song: songObj?.name });
             playSong(songObj);
         } else if (isLoop) {
             const songObj = allSongsData.find(song => song.src === currentAlbumSongs[0]);
+            logEvent('PLAYER', 'Riproduzione prima canzone (loop attivo)', { song: songObj?.name });
             playSong(songObj);
+        } else {
+            logEvent('INFO', 'Fine album raggiunta, nessuna canzone successiva');
         }
     });
 
@@ -747,6 +897,7 @@ const trackDurations = {
 };
 
 function initializeSearch() {
+    logEvent('INFO', 'Inizializzazione sistema di ricerca...');
     const searchBar = document.getElementById('search-bar');
     const searchResults = document.getElementById('search-results');
     let searchTimeout;
@@ -755,8 +906,11 @@ function initializeSearch() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             const searchTerm = e.target.value.toLowerCase().trim();
+            logEvent('SEARCH', `Ricerca avviata: "${searchTerm}"`);
+            
             if (searchTerm.length < 2) {
                 searchResults.style.display = 'none';
+                logEvent('SEARCH', 'Ricerca troppo breve, nascondo risultati');
                 return;
             }
 
@@ -801,9 +955,12 @@ function initializeSearch() {
                 }
             });
 
+            logEvent('SEARCH', `Trovati ${results.length} risultati per "${searchTerm}"`);
             displaySearchResults(results, searchResults);
         }, 300);
     });
+    
+    logEvent('SUCCESS', 'Sistema di ricerca inizializzato');
 }
 
 function displaySearchResults(results, container) {
@@ -1046,3 +1203,340 @@ function addCurrentSongToPlaylist() {
         alert('Errore: impossibile trovare i dati della canzone');
     }
 }
+
+// === FUNZIONALITÀ TESTI DELLE CANZONI ===
+
+// Variabili globali per i testi
+let currentLyrics = '';
+let lyricsLines = [];
+let currentHighlightedLine = -1;
+let timePerLine = 0;
+let lyricsUpdateInterval = null;
+let syncOffset = 0; // Offset per regolare la sincronizzazione manualmente
+
+// Elementi DOM per i testi
+const lyricsButton = document.getElementById('lyrics-button');
+const lyricsOverlay = document.getElementById('lyrics-overlay');
+const closeLyricsButton = document.getElementById('close-lyrics');
+const lyricsSongTitle = document.getElementById('lyrics-song-title');
+const lyricsContainer = document.getElementById('lyrics-container');
+const lyricsContent = document.getElementById('lyrics-content');
+const lyricsLoading = document.getElementById('lyrics-loading');
+const lyricsNotFound = document.getElementById('lyrics-not-found');
+
+/**
+ * Funzione per ottenere i testi di una canzone dall'API lyrics.ovh
+ * @param {string} artist - Nome dell'artista
+ * @param {string} title - Titolo della canzone
+ * @returns {Promise<string>} - I testi della canzone o un messaggio di errore
+ */
+async function getLyrics(artist, title) {
+    try {
+        // Pulisci e prepara i parametri per l'API
+        const cleanArtist = artist.replace(/\s*\(.*?\)\s*/g, '').trim();
+        const cleanTitle = title.replace(/\s*\(.*?\)\s*/g, '').replace(/\s*-.*$/, '').trim();
+        
+        logEvent('API', `Richiesta testi per: ${cleanArtist} - ${cleanTitle}`);
+        
+        const response = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(cleanArtist)}/${encodeURIComponent(cleanTitle)}`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.lyrics) {
+                logEvent('SUCCESS', 'Testi ricevuti dall\'API', { 
+                    artist: cleanArtist, 
+                    title: cleanTitle,
+                    lyricsLength: data.lyrics.length 
+                });
+                // Sostituisce i caratteri di nuova riga con <br> per la visualizzazione HTML
+                return data.lyrics.replace(/\n/g, '<br>');
+            }
+        }
+        
+        if (response.status === 404) {
+            logEvent('INFO', 'Testi non trovati (404)', { artist: cleanArtist, title: cleanTitle });
+            return 'not_found';
+        }
+        
+        throw new Error(`Errore HTTP: ${response.status}`);
+    } catch (error) {
+        logEvent('ERROR', 'Errore nel recupero dei testi', { 
+            artist, 
+            title, 
+            error: error.message 
+        });
+        return 'not_found';
+    }
+}
+
+/**
+ * Mostra i testi per la canzone correntemente in riproduzione
+ */
+async function showCurrentLyrics() {
+        if (!currentAlbumNames[currentSongIndex]) {
+        logEvent('LYRICS', 'Nessuna canzone corrente per mostrare i testi');
+        showLyricsNotFound();
+        return;
+    }
+    
+    // Estrae artista e titolo dal nome della canzone
+    const songName = currentAlbumNames[currentSongIndex];
+    const parts = songName.split(' - ');
+    let artist = '';
+    let title = '';
+    
+    if (parts.length >= 2) {
+        title = parts[0].trim();
+        artist = parts[1].replace(/\s*\(.*?\).*$/, '').trim();
+    } else {
+        // Fallback: usa l'artista dell'album
+        const albumCard = document.querySelector('.album-card');
+        if (albumCard) {
+            artist = albumCard.dataset.artist || '';
+            title = songName.trim();
+        }
+    }
+    
+    if (!artist || !title) {
+        logEvent('LYRICS', 'Impossibile estrarre artista/titolo', { songName, artist, title });
+        showLyricsNotFound();
+        return;
+    }
+    
+    logEvent('LYRICS', 'Inizio caricamento testi', { artist, title, songName });
+    
+    // Aggiorna il titolo nell'overlay
+    lyricsSongTitle.textContent = `${title} - ${artist}`;
+    
+    // Mostra lo stato di caricamento
+    showLyricsLoading();
+    
+    try {
+        const lyrics = await getLyrics(artist, title);
+        
+        if (lyrics === 'not_found') {
+            logEvent('LYRICS', 'Testi non disponibili per questa canzone');
+            showLyricsNotFound();
+        } else {
+            logEvent('SUCCESS', 'Testi caricati e visualizzati', { 
+                linesCount: lyrics.split('<br>').length 
+            });
+            displayLyrics(lyrics);
+            setupLyricsSync();
+        }
+    } catch (error) {
+        logEvent('ERROR', 'Errore nel caricamento dei testi', error);
+        showLyricsNotFound();
+    }
+}
+
+/**
+ * Visualizza i testi nell'overlay
+ * @param {string} lyrics - I testi da visualizzare
+ */
+function displayLyrics(lyrics) {
+    currentLyrics = lyrics;
+    
+    // Divide i testi in righe e crea elementi span per ogni riga
+    const lines = lyrics.split('<br>').filter(line => line.trim() !== '');
+    lyricsLines = lines;
+    
+    let lyricsHTML = '';
+    lines.forEach((line, index) => {
+        lyricsHTML += `<span class="lyric-line" data-line="${index}">${line.trim()}</span>`;
+    });
+    
+    lyricsContent.innerHTML = lyricsHTML;
+    
+    // Nascondi loading e mostra contenuto
+    lyricsLoading.style.display = 'none';
+    lyricsNotFound.style.display = 'none';
+    lyricsContent.style.display = 'block';
+}
+
+/**
+ * Mostra lo stato di caricamento dei testi
+ */
+function showLyricsLoading() {
+    lyricsLoading.style.display = 'flex';
+    lyricsContent.style.display = 'none';
+    lyricsNotFound.style.display = 'none';
+}
+
+/**
+ * Mostra il messaggio quando i testi non sono trovati
+ */
+function showLyricsNotFound() {
+    lyricsLoading.style.display = 'none';
+    lyricsContent.style.display = 'none';
+    lyricsNotFound.style.display = 'block';
+}
+
+/**
+ * Configura la sincronizzazione dei testi con l'audio
+ */
+function setupLyricsSync() {
+    const audioPlayer = document.getElementById('audio-player');
+    
+    if (!audioPlayer || lyricsLines.length === 0) return;
+    
+    // Calcola il tempo semplice per riga
+    const updateTimePerLine = () => {
+        if (audioPlayer.duration && audioPlayer.duration > 0) {
+            timePerLine = audioPlayer.duration / lyricsLines.length;
+            logEvent('LYRICS', `Sincronizzazione configurata: ${audioPlayer.duration}s / ${lyricsLines.length} righe = ${timePerLine.toFixed(2)}s per riga`);
+        }
+    };
+    
+    // Controlla se i metadati sono già caricati
+    if (audioPlayer.readyState >= 1) {
+        updateTimePerLine();
+    } else {
+        audioPlayer.addEventListener('loadedmetadata', updateTimePerLine);
+    }
+    
+    // Rimuovi il listener precedente se esiste
+    audioPlayer.removeEventListener('timeupdate', updateLyricsHighlight);
+    
+    // Aggiungi il nuovo listener per la sincronizzazione
+    audioPlayer.addEventListener('timeupdate', updateLyricsHighlight);
+}
+
+/**
+ * Aggiorna l'evidenziazione dei testi in base al tempo corrente - VERSIONE SEMPLIFICATA
+ */
+function updateLyricsHighlight() {
+    const audioPlayer = document.getElementById('audio-player');
+    
+    if (!audioPlayer || !timePerLine || lyricsLines.length === 0) return;
+    
+    // Applica l'offset di sincronizzazione
+    const currentTime = audioPlayer.currentTime + syncOffset;
+    
+    // Calcolo SEMPLICE: dividi il tempo corrente per il tempo per riga
+    const currentLineIndex = Math.floor(currentTime / timePerLine);
+    
+    // Limita l'indice al numero di righe disponibili
+    const validLineIndex = Math.max(0, Math.min(currentLineIndex, lyricsLines.length - 1));
+    
+    if (validLineIndex !== currentHighlightedLine && validLineIndex >= 0) {
+        // Rimuovi l'evidenziazione dalla riga precedente
+        if (currentHighlightedLine >= 0) {
+            const prevLine = lyricsContent.querySelector(`[data-line="${currentHighlightedLine}"]`);
+            if (prevLine) {
+                prevLine.classList.remove('highlight');
+            }
+        }
+        
+        // Aggiungi l'evidenziazione alla riga corrente
+        const currentLine = lyricsContent.querySelector(`[data-line="${validLineIndex}"]`);
+        if (currentLine) {
+            currentLine.classList.add('highlight');
+            
+            // Scorri fino alla riga corrente
+            currentLine.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+        
+        currentHighlightedLine = validLineIndex;
+        
+        // Log di debug più dettagliato
+        logEvent('LYRICS', `Sync: ${currentTime.toFixed(1)}s → Riga ${validLineIndex + 1}/${lyricsLines.length} | Offset: ${syncOffset.toFixed(1)}s`);
+    }
+}
+
+/**
+ * Apre l'overlay dei testi
+ */
+function openLyricsOverlay() {
+    logEvent('LYRICS', 'Apertura overlay testi');
+    lyricsOverlay.classList.add('active');
+    lyricsButton.classList.add('active');
+    
+    // Carica i testi per la canzone corrente
+    showCurrentLyrics();
+}
+
+/**
+ * Chiude l'overlay dei testi
+ */
+function closeLyricsOverlay() {
+    logEvent('LYRICS', 'Chiusura overlay testi');
+    lyricsOverlay.classList.remove('active');
+    lyricsButton.classList.remove('active');
+    
+    // Reset dell'evidenziazione
+    currentHighlightedLine = -1;
+    
+    // Rimuovi tutti gli highlight
+    const highlightedLines = lyricsContent.querySelectorAll('.lyric-line.highlight');
+    highlightedLines.forEach(line => line.classList.remove('highlight'));
+}
+
+// Event listeners per i testi
+if (lyricsButton) {
+    lyricsButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        logEvent('UI', 'Click su pulsante testi');
+        if (lyricsOverlay.classList.contains('active')) {
+            closeLyricsOverlay();
+        } else {
+            openLyricsOverlay();
+        }
+    });
+}
+
+if (closeLyricsButton) {
+    closeLyricsButton.addEventListener('click', () => {
+        logEvent('UI', 'Click su pulsante chiudi testi');
+        closeLyricsOverlay();
+    });
+}
+
+// Chiudi l'overlay cliccando fuori dal contenuto
+if (lyricsOverlay) {
+    lyricsOverlay.addEventListener('click', (e) => {
+        if (e.target === lyricsOverlay) {
+            logEvent('UI', 'Click fuori dall\'overlay testi');
+            closeLyricsOverlay();
+        }
+    });
+}
+
+// Chiudi l'overlay con il tasto Escape e gestisci controlli sincronizzazione
+document.addEventListener('keydown', (e) => {
+    if (lyricsOverlay && lyricsOverlay.classList.contains('active')) {
+        if (e.key === 'Escape') {
+            logEvent('UI', 'Pressione tasto Escape - chiusura overlay testi');
+            closeLyricsOverlay();
+        } else if (e.key === 'ArrowUp') {
+            // Anticipa la sincronizzazione di 1 secondo
+            syncOffset += 1;
+            logEvent('LYRICS', `Sincronizzazione anticipata: offset +1s (totale: ${syncOffset.toFixed(1)}s)`);
+            e.preventDefault();
+        } else if (e.key === 'ArrowDown') {
+            // Ritarda la sincronizzazione di 1 secondo
+            syncOffset -= 1;
+            logEvent('LYRICS', `Sincronizzazione ritardata: offset -1s (totale: ${syncOffset.toFixed(1)}s)`);
+            e.preventDefault();
+        } else if (e.key === 'r' || e.key === 'R') {
+            // Reset offset
+            syncOffset = 0;
+            logEvent('LYRICS', 'Offset sincronizzazione resettato');
+            e.preventDefault();
+        }
+    }
+});
+
+// === LOGGING SISTEMA COMPLETATO ===
+logEvent('SUCCESS', '=== SISTEMA DI LOGGING ATTIVATO ===');
+logEvent('INFO', 'Tutti gli eventi verranno tracciati nella console del browser');
+logEvent('INFO', 'Per attivare i log su schermo, cambia LOG_CONFIG.logToScreen = true');
+
+// Log di benvenuto
+setTimeout(() => {
+    logEvent('INFO', '🎵 Benvenuto in Minerify! 🎵');
+    logEvent('INFO', 'Per migliori informazioni di debug, apri la console del browser (F12)');
+}, 1000);

@@ -188,6 +188,32 @@
         </div>
     </div>
 
+    <!-- Lyrics Overlay -->
+    <div id="lyrics-overlay" class="lyrics-overlay">
+        <div class="lyrics-overlay-content">
+            <div class="lyrics-header">
+                <h2 id="lyrics-song-title">Testi della canzone</h2>
+                <button class="lyrics-close-btn" id="close-lyrics">&times;</button>
+            </div>
+            <div class="lyrics-controls">
+                <small style="color: #b3b3b3; text-align: center; display: block; padding: 5px 0;">
+                    ⬆️ Anticipa | ⬇️ Ritarda | R Reset | ESC Chiudi
+                </small>
+            </div>
+            <div class="lyrics-container" id="lyrics-container">
+                <div class="lyrics-loading" id="lyrics-loading">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="visually-hidden">Caricamento testi...</span>
+                    </div>
+                </div>
+                <div class="lyrics-content" id="lyrics-content"></div>
+                <div class="lyrics-not-found" id="lyrics-not-found" style="display: none;">
+                    <p>Testi non disponibili per questa canzone</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <p>© 2024 Minerify - Tutti i diritti riservati</p>
     </footer>
@@ -222,6 +248,7 @@
         </div>
         <button id="like-button" class="like-button">❤️</button> <!-- Pulsante per i preferiti -->
         <button id="add-to-playlist-button" class="add-to-playlist-button" title="Aggiungi alla mia playlist"><i class="bi bi-plus-circle"></i></button>
+        <button id="lyrics-button" class="lyrics-button" title="Visualizza testi"><i class="bi bi-chat-quote"></i></button>
     </div>
 
     <audio id="audio-player" src="" preload="none"></audio>

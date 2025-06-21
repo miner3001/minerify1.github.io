@@ -786,3 +786,232 @@ button:hover {
     color: #007acc;
     transform: scale(1.05);
 }
+
+/* Stili per il pulsante dei testi nella player bar */
+.lyrics-button {
+    background: none;
+    border: none;
+    color: #b3b3b3;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.lyrics-button:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.lyrics-button.active {
+    color: #007acc;
+    background-color: rgba(0, 122, 204, 0.2);
+}
+
+/* Overlay per i testi */
+.lyrics-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 10000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lyrics-overlay.active {
+    display: flex;
+    opacity: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.lyrics-overlay-content {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    padding: 0;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    overflow: hidden;
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.lyrics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #333;
+    background: linear-gradient(90deg, #007acc 0%, #0099ff 100%);
+}
+
+.lyrics-header h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.lyrics-close-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.lyrics-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.lyrics-container {
+    padding: 25px;
+    height: 400px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.lyrics-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lyrics-container::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 4px;
+}
+
+.lyrics-container::-webkit-scrollbar-thumb {
+    background: #007acc;
+    border-radius: 4px;
+}
+
+.lyrics-container::-webkit-scrollbar-thumb:hover {
+    background: #0099ff;
+}
+
+.lyrics-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+.lyrics-content {
+    line-height: 2.2;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.lyric-line {
+    display: block;
+    margin: 8px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.4s ease;
+    color: #b3b3b3;
+    cursor: pointer;
+}
+
+.lyric-line:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+/* Classe per evidenziare la riga corrente dei testi */
+.lyric-line.highlight {
+    color: #007acc !important;
+    font-weight: 700;
+    font-size: 1.2em;
+    background: linear-gradient(90deg, rgba(0, 122, 204, 0.1) 0%, rgba(0, 153, 255, 0.1) 100%);
+    border-left: 4px solid #007acc;
+    transform: scale(1.02);
+    box-shadow: 0 2px 15px rgba(0, 122, 204, 0.3);
+}
+
+.lyrics-not-found {
+    text-align: center;
+    color: #b3b3b3;
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+.lyrics-not-found p {
+    margin: 0;
+    font-size: 1.1em;
+}
+
+/* Stile per i controlli di sincronizzazione dei testi */
+.lyrics-controls {
+    background: rgba(0, 122, 204, 0.1);
+    border-bottom: 1px solid #333;
+    padding: 5px 15px;
+}
+
+.lyrics-controls small {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Responsive design per dispositivi mobili */
+@media (max-width: 768px) {
+    .lyrics-overlay-content {
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .lyrics-header {
+        padding: 15px 20px;
+    }
+    
+    .lyrics-header h2 {
+        font-size: 1.2em;
+    }
+    
+    .lyrics-container {
+        padding: 20px;
+        height: 350px;
+    }
+    
+    .lyrics-content {
+        font-size: 1em;
+        line-height: 2;
+    }
+    
+    .lyric-line.highlight {
+        font-size: 1.1em;
+    }
+}
