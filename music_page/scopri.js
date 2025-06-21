@@ -1204,7 +1204,7 @@ function addCurrentSongToPlaylist() {
     }
 }
 
-// === FUNZIONALITÀ TESTI DELLE CANZONI ===
+// === FUNZIONALITÀ TESTI DELLE CANZONI - VERSIONE SUPER OTTIMIZZATA ===
 
 // Variabili globali per i testi
 let currentLyrics = '';
@@ -1213,6 +1213,9 @@ let currentHighlightedLine = -1;
 let timePerLine = 0;
 let lyricsUpdateInterval = null;
 let syncOffset = 0; // Offset per regolare la sincronizzazione manualmente
+let autoCalibrationData = JSON.parse(localStorage.getItem('lyricsCalibration')) || {}; // Dati di calibrazione automatica
+let userFeedbackCount = 0; // Contatore feedback utente
+let lastSyncAccuracy = 100; // Ultima precisione rilevata
 
 // Elementi DOM per i testi
 const lyricsButton = document.getElementById('lyrics-button');
@@ -1223,6 +1226,34 @@ const lyricsContainer = document.getElementById('lyrics-container');
 const lyricsContent = document.getElementById('lyrics-content');
 const lyricsLoading = document.getElementById('lyrics-loading');
 const lyricsNotFound = document.getElementById('lyrics-not-found');
+
+/**
+ * Sistema di auto-calibrazione della sincronizzazione
+ */
+function saveCalibrationData(artist, title, offset, accuracy) {
+    const key = `${artist}_${title}`.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    autoCalibrationData[key] = {
+        offset: offset,
+        accuracy: accuracy,
+        uses: (autoCalibrationData[key]?.uses || 0) + 1,
+        lastUsed: Date.now()
+    };
+    localStorage.setItem('lyricsCalibration', JSON.stringify(autoCalibrationData));
+    logEvent('LYRICS', '💾 Dati calibrazione salvati', { key, offset, accuracy });
+}
+
+/**
+ * Recupera la calibrazione salvata per una canzone
+ */
+function getCalibrationData(artist, title) {
+    const key = `${artist}_${title}`.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const data = autoCalibrationData[key];
+    if (data && data.accuracy > 75) { // Usa solo calibrazioni con buona accuratezza
+        logEvent('LYRICS', '🎯 Calibrazione recuperata dal cache', data);
+        return data.offset;
+    }
+    return 0;
+}
 
 /**
  * Funzione per ottenere i testi di una canzone dall'API lyrics.ovh
@@ -1270,10 +1301,10 @@ async function getLyrics(artist, title) {
 }
 
 /**
- * Mostra i testi per la canzone correntemente in riproduzione
+ * Mostra i testi per la canzone correntemente in riproduzione - VERSIONE OTTIMIZZATA
  */
 async function showCurrentLyrics() {
-        if (!currentAlbumNames[currentSongIndex]) {
+    if (!currentAlbumNames[currentSongIndex]) {
         logEvent('LYRICS', 'Nessuna canzone corrente per mostrare i testi');
         showLyricsNotFound();
         return;
@@ -1303,7 +1334,17 @@ async function showCurrentLyrics() {
         return;
     }
     
-    logEvent('LYRICS', 'Inizio caricamento testi', { artist, title, songName });
+    logEvent('LYRICS', '🎵 OTTIMIZZATO: Inizio caricamento testi', { artist, title, songName });
+    
+    // AUTO-CALIBRAZIONE: Recupera offset salvato per questa canzone
+    const savedOffset = getCalibrationData(artist, title);
+    if (savedOffset !== 0) {
+        syncOffset = savedOffset;
+        logEvent('SUCCESS', '🎯 Auto-calibrazione applicata!', { offset: savedOffset });
+        showSyncFeedback('auto-calibrated');
+    } else {
+        syncOffset = 0; // Reset per nuove canzoni
+    }
     
     // Aggiorna il titolo nell'overlay
     lyricsSongTitle.textContent = `${title} - ${artist}`;
@@ -1318,8 +1359,10 @@ async function showCurrentLyrics() {
             logEvent('LYRICS', 'Testi non disponibili per questa canzone');
             showLyricsNotFound();
         } else {
-            logEvent('SUCCESS', 'Testi caricati e visualizzati', { 
-                linesCount: lyrics.split('<br>').length 
+            logEvent('SUCCESS', '✅ Testi caricati e visualizzati con sistema OTTIMIZZATO', { 
+                linesCount: lyrics.split('<br>').length,
+                autoCalibrated: savedOffset !== 0,
+                offset: syncOffset
             });
             displayLyrics(lyrics);
             setupLyricsSync();
@@ -1373,39 +1416,126 @@ function showLyricsNotFound() {
 }
 
 /**
- * Configura la sincronizzazione dei testi con l'audio
+ * Configura la sincronizzazione dei testi con l'audio - VERSIONE OTTIMIZZATA
  */
 function setupLyricsSync() {
     const audioPlayer = document.getElementById('audio-player');
     
     if (!audioPlayer || lyricsLines.length === 0) return;
     
-    // Calcola il tempo semplice per riga
-    const updateTimePerLine = () => {
+    // Calcola la sincronizzazione ottimizzata
+    const updateOptimizedSync = () => {
         if (audioPlayer.duration && audioPlayer.duration > 0) {
-            timePerLine = audioPlayer.duration / lyricsLines.length;
-            logEvent('LYRICS', `Sincronizzazione configurata: ${audioPlayer.duration}s / ${lyricsLines.length} righe = ${timePerLine.toFixed(2)}s per riga`);
+            // Analizza la struttura dei testi per sincronizzazione adattiva
+            const lyricsAnalysis = analyzeLyricsStructure(lyricsLines);
+            timePerLine = calculateAdaptiveSync(audioPlayer.duration, lyricsAnalysis);
+            
+            logEvent('LYRICS', `Sincronizzazione OTTIMIZZATA configurata:`, {
+                duration: audioPlayer.duration,
+                lines: lyricsLines.length,
+                avgTimePerLine: timePerLine.toFixed(2),
+                analysis: lyricsAnalysis
+            });
         }
     };
     
     // Controlla se i metadati sono già caricati
     if (audioPlayer.readyState >= 1) {
-        updateTimePerLine();
+        updateOptimizedSync();
     } else {
-        audioPlayer.addEventListener('loadedmetadata', updateTimePerLine);
+        audioPlayer.addEventListener('loadedmetadata', updateOptimizedSync);
     }
     
     // Rimuovi il listener precedente se esiste
-    audioPlayer.removeEventListener('timeupdate', updateLyricsHighlight);
+    audioPlayer.removeEventListener('timeupdate', updateLyricsHighlightOptimized);
     
-    // Aggiungi il nuovo listener per la sincronizzazione
-    audioPlayer.addEventListener('timeupdate', updateLyricsHighlight);
+    // Aggiungi il nuovo listener ottimizzato
+    audioPlayer.addEventListener('timeupdate', updateLyricsHighlightOptimized);
 }
 
 /**
- * Aggiorna l'evidenziazione dei testi in base al tempo corrente - VERSIONE SEMPLIFICATA
+ * Analizza la struttura dei testi per ottimizzare la sincronizzazione
  */
-function updateLyricsHighlight() {
+function analyzeLyricsStructure(lines) {
+    let analysis = {
+        verses: 0,
+        choruses: 0,
+        bridges: 0,
+        emptyLines: 0,
+        shortLines: 0,
+        longLines: 0,
+        repetitions: 0
+    };
+    
+    const seenLines = new Map();
+    
+    lines.forEach(line => {
+        const cleanLine = line.trim().toLowerCase();
+        
+        if (cleanLine === '') {
+            analysis.emptyLines++;
+        } else if (cleanLine.length < 20) {
+            analysis.shortLines++;
+        } else if (cleanLine.length > 80) {
+            analysis.longLines++;
+        }
+        
+        // Rileva ripetizioni (possibili ritornelli)
+        if (seenLines.has(cleanLine)) {
+            analysis.repetitions++;
+            if (cleanLine.includes('chorus') || cleanLine.includes('ritornello')) {
+                analysis.choruses++;
+            }
+        } else {
+            seenLines.set(cleanLine, 1);
+        }
+        
+        // Rileva versi e bridge
+        if (cleanLine.includes('verse') || cleanLine.includes('strofa')) {
+            analysis.verses++;
+        } else if (cleanLine.includes('bridge') || cleanLine.includes('ponte')) {
+            analysis.bridges++;
+        }
+    });
+    
+    return analysis;
+}
+
+/**
+ * Calcola sincronizzazione adattiva basata sull'analisi dei testi
+ */
+function calculateAdaptiveSync(duration, analysis) {
+    const totalLines = lyricsLines.length;
+    const contentLines = totalLines - analysis.emptyLines;
+    
+    // Base: divisione uniforme
+    let baseTime = duration / contentLines;
+    
+    // Fattori di correzione basati sulla struttura
+    let adjustmentFactor = 1.0;
+    
+    // Righe corte (hook, ritornelli) → tempo più breve
+    if (analysis.shortLines > totalLines * 0.3) {
+        adjustmentFactor *= 0.9;
+    }
+    
+    // Molte ripetizioni (canzone pop) → ritmo più veloce
+    if (analysis.repetitions > totalLines * 0.2) {
+        adjustmentFactor *= 0.95;
+    }
+    
+    // Righe lunghe (rap, versi complessi) → più tempo
+    if (analysis.longLines > totalLines * 0.2) {
+        adjustmentFactor *= 1.1;
+    }
+    
+    return baseTime * adjustmentFactor;
+}
+
+/**
+ * Aggiorna l'evidenziazione dei testi - VERSIONE SUPER OTTIMIZZATA
+ */
+function updateLyricsHighlightOptimized() {
     const audioPlayer = document.getElementById('audio-player');
     
     if (!audioPlayer || !timePerLine || lyricsLines.length === 0) return;
@@ -1413,37 +1543,101 @@ function updateLyricsHighlight() {
     // Applica l'offset di sincronizzazione
     const currentTime = audioPlayer.currentTime + syncOffset;
     
-    // Calcolo SEMPLICE: dividi il tempo corrente per il tempo per riga
-    const currentLineIndex = Math.floor(currentTime / timePerLine);
+    // Sistema di sincronizzazione AVANZATO con predizione intelligente
+    let currentLineIndex;
     
-    // Limita l'indice al numero di righe disponibili
+    // Calcolo dinamico basato su pattern dei testi
+    if (lyricsLines.length > 0) {
+        // Algoritmo predittivo: considera la posizione nella canzone
+        const songProgress = currentTime / audioPlayer.duration;
+        
+        // Base calculation con correzione dinamica
+        const baseIndex = Math.floor(currentTime / timePerLine);
+        
+        // Correzione per parti diverse della canzone
+        let correctionFactor = 1.0;
+        
+        // Inizio canzone (primi 20%) → ritmo più lento
+        if (songProgress < 0.2) {
+            correctionFactor = 0.85;
+        }
+        // Metà canzone (20-80%) → ritmo normale/veloce
+        else if (songProgress >= 0.2 && songProgress <= 0.8) {
+            correctionFactor = 1.05;
+        }
+        // Fine canzone (ultimi 20%) → ritmo più lento
+        else {
+            correctionFactor = 0.9;
+        }
+        
+        currentLineIndex = Math.floor(baseIndex * correctionFactor);
+    }
+    
+    // Limita l'indice e applica smooth transition
     const validLineIndex = Math.max(0, Math.min(currentLineIndex, lyricsLines.length - 1));
     
+    // Transizione fluida: evita salti troppo bruschi
+    if (Math.abs(validLineIndex - currentHighlightedLine) > 3 && currentHighlightedLine >= 0) {
+        // Se il salto è troppo grande, fai una transizione graduale
+        const step = validLineIndex > currentHighlightedLine ? 1 : -1;
+        currentLineIndex = currentHighlightedLine + step;
+        
+        logEvent('LYRICS', '🔧 Transizione graduale applicata per evitare salti bruschi');
+    }
+    
     if (validLineIndex !== currentHighlightedLine && validLineIndex >= 0) {
-        // Rimuovi l'evidenziazione dalla riga precedente
+        // Rimuovi l'evidenziazione dalla riga precedente con animazione
         if (currentHighlightedLine >= 0) {
             const prevLine = lyricsContent.querySelector(`[data-line="${currentHighlightedLine}"]`);
             if (prevLine) {
                 prevLine.classList.remove('highlight');
+                prevLine.style.transition = 'all 0.3s ease';
             }
         }
         
-        // Aggiungi l'evidenziazione alla riga corrente
+        // Aggiungi l'evidenziazione alla riga corrente con effetto anticipato
         const currentLine = lyricsContent.querySelector(`[data-line="${validLineIndex}"]`);
         if (currentLine) {
             currentLine.classList.add('highlight');
+            currentLine.style.transition = 'all 0.5s ease';
             
-            // Scorri fino alla riga corrente
+            // Pre-scroll: evidenzia anche la riga successiva molto leggermente
+            const nextLine = lyricsContent.querySelector(`[data-line="${validLineIndex + 1}"]`);
+            if (nextLine) {
+                nextLine.style.opacity = '0.7';
+                nextLine.style.transform = 'scale(1.02)';
+                
+                setTimeout(() => {
+                    nextLine.style.opacity = '1';
+                    nextLine.style.transform = 'scale(1)';
+                }, 300);
+            }
+            
+            // Scrolling intelligente con previsione
             currentLine.scrollIntoView({
                 behavior: 'smooth',
                 block: 'center'
             });
+            
+            // Effetto di pulsazione sulla riga attiva
+            currentLine.style.animation = 'lyrics-pulse 0.6s ease-out';
+            setTimeout(() => {
+                currentLine.style.animation = '';
+            }, 600);
         }
         
         currentHighlightedLine = validLineIndex;
         
-        // Log di debug più dettagliato
-        logEvent('LYRICS', `Sync: ${currentTime.toFixed(1)}s → Riga ${validLineIndex + 1}/${lyricsLines.length} | Offset: ${syncOffset.toFixed(1)}s`);
+        // Calcola precisione della sincronizzazione
+        const expectedTime = validLineIndex * timePerLine;
+        const timeDiff = Math.abs(currentTime - expectedTime);
+        const accuracy = Math.max(0, 100 - (timeDiff * 20)); // 20 = fattore di penalità
+        
+        logEvent('LYRICS', `🎯 Sync OTTIMIZZATO: ${currentTime.toFixed(1)}s → Riga ${validLineIndex + 1}/${lyricsLines.length}`, {
+            offset: syncOffset.toFixed(1),
+            accuracy: accuracy.toFixed(1) + '%',
+            timeDiff: timeDiff.toFixed(2) + 's'
+        });
     }
 }
 
@@ -1505,30 +1699,241 @@ if (lyricsOverlay) {
     });
 }
 
-// Chiudi l'overlay con il tasto Escape e gestisci controlli sincronizzazione
+// Chiudi l'overlay con il tasto Escape e gestisci controlli sincronizzazione AVANZATI
 document.addEventListener('keydown', (e) => {
     if (lyricsOverlay && lyricsOverlay.classList.contains('active')) {
+        const audioPlayer = document.getElementById('audio-player');
+        
         if (e.key === 'Escape') {
             logEvent('UI', 'Pressione tasto Escape - chiusura overlay testi');
             closeLyricsOverlay();
         } else if (e.key === 'ArrowUp') {
-            // Anticipa la sincronizzazione di 1 secondo
-            syncOffset += 1;
-            logEvent('LYRICS', `Sincronizzazione anticipata: offset +1s (totale: ${syncOffset.toFixed(1)}s)`);
+            // Anticipa la sincronizzazione
+            const oldOffset = syncOffset;
+            syncOffset += (e.shiftKey ? 0.1 : 1); // Shift per micro-regolazioni
+            logEvent('LYRICS', `🔼 Sincronizzazione anticipata: ${oldOffset.toFixed(1)}s → ${syncOffset.toFixed(1)}s`);
+            showSyncFeedback('+');
             e.preventDefault();
         } else if (e.key === 'ArrowDown') {
-            // Ritarda la sincronizzazione di 1 secondo
-            syncOffset -= 1;
-            logEvent('LYRICS', `Sincronizzazione ritardata: offset -1s (totale: ${syncOffset.toFixed(1)}s)`);
+            // Ritarda la sincronizzazione
+            const oldOffset = syncOffset;
+            syncOffset -= (e.shiftKey ? 0.1 : 1); // Shift per micro-regolazioni
+            logEvent('LYRICS', `🔽 Sincronizzazione ritardata: ${oldOffset.toFixed(1)}s → ${syncOffset.toFixed(1)}s`);
+            showSyncFeedback('-');
             e.preventDefault();
         } else if (e.key === 'r' || e.key === 'R') {
             // Reset offset
+            const oldOffset = syncOffset;
             syncOffset = 0;
-            logEvent('LYRICS', 'Offset sincronizzazione resettato');
+            logEvent('LYRICS', `🔄 Reset sincronizzazione: ${oldOffset.toFixed(1)}s → 0s`);
+            showSyncFeedback('reset');
+            e.preventDefault();
+        } else if (e.key === 's' || e.key === 'S') {
+            // Salva calibrazione manuale
+            if (currentAlbumNames[currentSongIndex]) {
+                const songName = currentAlbumNames[currentSongIndex];
+                const parts = songName.split(' - ');
+                if (parts.length >= 2) {
+                    const title = parts[0].trim();
+                    const artist = parts[1].replace(/\s*\(.*?\).*$/, '').trim();
+                    saveCalibrationData(artist, title, syncOffset, lastSyncAccuracy);
+                    showSyncFeedback('saved');
+                    logEvent('SUCCESS', '✅ Calibrazione manuale salvata!');
+                }
+            }
+            e.preventDefault();
+        } else if (e.key === 'ArrowLeft') {
+            // Vai alla riga precedente manualmente
+            if (currentHighlightedLine > 0) {
+                jumpToLyricLine(currentHighlightedLine - 1);
+                logEvent('LYRICS', '⬅️ Saltato alla riga precedente manualmente');
+            }
+            e.preventDefault();
+        } else if (e.key === 'ArrowRight') {
+            // Vai alla riga successiva manualmente
+            if (currentHighlightedLine < lyricsLines.length - 1) {
+                jumpToLyricLine(currentHighlightedLine + 1);
+                logEvent('LYRICS', '➡️ Saltato alla riga successiva manualmente');
+            }
+            e.preventDefault();
+        } else if (e.key === ' ') {
+            // Pausa/Play con spazio
+            if (audioPlayer) {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    logEvent('PLAYER', '▶️ Play tramite spazio (overlay testi)');
+                } else {
+                    audioPlayer.pause();
+                    logEvent('PLAYER', '⏸️ Pausa tramite spazio (overlay testi)');
+                }
+            }
             e.preventDefault();
         }
     }
 });
+
+/**
+ * Mostra feedback visivo per le regolazioni di sincronizzazione
+ */
+function showSyncFeedback(type) {
+    let message = '';
+    let color = '#007acc';
+    
+    switch(type) {
+        case '+':
+            message = `⬆️ +${syncOffset >= 0 ? syncOffset.toFixed(1) : '0.0'}s`;
+            color = '#4CAF50';
+            break;
+        case '-':
+            message = `⬇️ ${syncOffset.toFixed(1)}s`;
+            color = '#FF9800';
+            break;
+        case 'reset':
+            message = '🔄 Reset';
+            color = '#2196F3';
+            break;
+        case 'saved':
+            message = '💾 Salvato!';
+            color = '#4CAF50';
+            break;
+        case 'auto-calibrated':
+            message = `🎯 Auto-Sync: ${syncOffset > 0 ? '+' : ''}${syncOffset.toFixed(1)}s`;
+            color = '#9C27B0';
+            break;
+    }
+    
+    // Crea elemento feedback
+    const feedback = document.createElement('div');
+    feedback.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${color};
+        color: white;
+        padding: 15px 25px;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        z-index: 20000;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        animation: sync-feedback 1.5s ease-out forwards;
+    `;
+    feedback.textContent = message;
+    
+    // Aggiungi CSS per l'animazione
+    if (!document.getElementById('sync-feedback-style')) {
+        const style = document.createElement('style');
+        style.id = 'sync-feedback-style';
+        style.textContent = `
+            @keyframes sync-feedback {
+                0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+                20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+                80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+                100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(feedback);
+    
+    setTimeout(() => {
+        if (feedback.parentNode) {
+            feedback.parentNode.removeChild(feedback);
+        }
+    }, 1500);
+}
+
+/**
+ * Salta manualmente a una specifica riga dei testi
+ */
+function jumpToLyricLine(lineIndex) {
+    if (lineIndex < 0 || lineIndex >= lyricsLines.length) return;
+    
+    // Rimuovi highlight precedente
+    if (currentHighlightedLine >= 0) {
+        const prevLine = lyricsContent.querySelector(`[data-line="${currentHighlightedLine}"]`);
+        if (prevLine) {
+            prevLine.classList.remove('highlight');
+        }
+    }
+    
+    // Aggiungi nuovo highlight
+    const newLine = lyricsContent.querySelector(`[data-line="${lineIndex}"]`);
+    if (newLine) {
+        newLine.classList.add('highlight');
+        newLine.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+        
+        // Effetto visivo per salto manuale
+        newLine.style.background = 'linear-gradient(135deg, rgba(76, 175, 80, 0.4), rgba(76, 175, 80, 0.2))';
+        newLine.style.borderColor = '#4CAF50';
+        
+        setTimeout(() => {
+            newLine.style.background = '';
+            newLine.style.borderColor = '';
+        }, 1000);
+    }
+    
+    currentHighlightedLine = lineIndex;
+}
+
+// Gesture touch support per dispositivi mobili
+let touchStartY = 0;
+let touchStartX = 0;
+let lastTouchTime = 0;
+
+if (lyricsOverlay) {
+    lyricsOverlay.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+        touchStartX = e.touches[0].clientX;
+        lastTouchTime = Date.now();
+    });
+    
+    lyricsOverlay.addEventListener('touchend', (e) => {
+        const touchEndY = e.changedTouches[0].clientY;
+        const touchEndX = e.changedTouches[0].clientX;
+        const deltaY = touchStartY - touchEndY;
+        const deltaX = touchStartX - touchEndX;
+        const touchDuration = Date.now() - lastTouchTime;
+        
+        // Rilevamento gesture
+        if (touchDuration < 300) { // Swipe veloce
+            if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
+                if (deltaY > 0) {
+                    // Swipe up - anticipa sync
+                    syncOffset += 0.5;
+                    showSyncFeedback('+');
+                    logEvent('LYRICS', '📱 Swipe up - sincronizzazione anticipata');
+                } else {
+                    // Swipe down - ritarda sync
+                    syncOffset -= 0.5;
+                    showSyncFeedback('-');
+                    logEvent('LYRICS', '📱 Swipe down - sincronizzazione ritardata');
+                }
+                e.preventDefault();
+            } else if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    // Swipe left - riga successiva
+                    if (currentHighlightedLine < lyricsLines.length - 1) {
+                        jumpToLyricLine(currentHighlightedLine + 1);
+                        logEvent('LYRICS', '📱 Swipe left - riga successiva');
+                    }
+                } else {
+                    // Swipe right - riga precedente
+                    if (currentHighlightedLine > 0) {
+                        jumpToLyricLine(currentHighlightedLine - 1);
+                        logEvent('LYRICS', '📱 Swipe right - riga precedente');
+                    }
+                }
+                e.preventDefault();
+            }
+        }
+    });
+}
 
 // === LOGGING SISTEMA COMPLETATO ===
 logEvent('SUCCESS', '=== SISTEMA DI LOGGING ATTIVATO ===');

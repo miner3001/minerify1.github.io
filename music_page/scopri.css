@@ -816,92 +816,99 @@ button:hover {
     background-color: rgba(0, 122, 204, 0.2);
 }
 
-/* Overlay per i testi */
+/* Overlay per i testi - STILE COERENTE CON IL SITO */
 .lyrics-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.3); /* Sfondo molto più trasparente */
+    backdrop-filter: blur(20px); /* Effetto vetro aumentato */
+    -webkit-backdrop-filter: blur(20px);
     z-index: 10000;
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: scale(0.95);
 }
 
 .lyrics-overlay.active {
-    display: flex;
     opacity: 1;
-    align-items: center;
-    justify-content: center;
+    visibility: visible;
+    transform: scale(1);
 }
 
 .lyrics-overlay-content {
-    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.15); /* Trasparenza leggera come le album-card */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 122, 204, 0.3); /* Bordo blu coerente */
+    border-radius: 20px; /* Stile arrotondato coerente */
     width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
-    padding: 0;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    border: 1px solid #333;
+    max-width: 700px;
+    max-height: 85vh;
     overflow: hidden;
-    animation: slideUp 0.4s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        transform: translateY(50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+    box-shadow: 
+        0 0 25px rgba(0, 122, 204, 0.2),
+        inset 0 0 20px rgba(0, 122, 204, 0.1);
+    transition: all 0.3s ease;
 }
 
 .lyrics-header {
+    background: rgba(0, 122, 204, 0.2); /* Stile simile ai pulsanti del sito */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 122, 204, 0.3);
+    border-radius: 15px 15px 0 0;
+    padding: 20px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 25px;
-    border-bottom: 1px solid #333;
-    background: linear-gradient(90deg, #007acc 0%, #0099ff 100%);
+    position: relative;
 }
 
 .lyrics-header h2 {
     margin: 0;
-    color: #fff;
-    font-size: 1.4em;
+    color: #007acc; /* Colore blu coerente */
+    font-size: 1.5em;
     font-weight: 600;
+    text-shadow: 0 0 10px rgba(0, 122, 204, 0.5); /* Effetto neon come nel sito */
 }
 
 .lyrics-close-btn {
-    background: none;
-    border: none;
-    color: #fff;
-    font-size: 24px;
+    background: rgba(0, 122, 204, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(0, 122, 204, 0.3);
+    color: white;
+    font-size: 18px;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .lyrics-close-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 122, 204, 0.4);
+    border-color: rgba(0, 122, 204, 0.8);
+    box-shadow: 0 0 15px rgba(0, 122, 204, 0.5); /* Effetto glow coerente */
+    transform: scale(1.1);
 }
 
 .lyrics-container {
     padding: 25px;
-    height: 400px;
+    max-height: 400px;
     overflow-y: auto;
+    background: transparent; /* Sfondo completamente trasparente */
     position: relative;
 }
 
@@ -910,108 +917,198 @@ button:hover {
 }
 
 .lyrics-container::-webkit-scrollbar-track {
-    background: #1e1e1e;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
 }
 
 .lyrics-container::-webkit-scrollbar-thumb {
-    background: #007acc;
+    background: rgba(0, 122, 204, 0.6); /* Scrollbar blu coerente */
     border-radius: 4px;
+    border: 1px solid rgba(0, 122, 204, 0.3);
 }
 
 .lyrics-container::-webkit-scrollbar-thumb:hover {
-    background: #0099ff;
-}
-
-.lyrics-loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
+    background: rgba(0, 122, 204, 0.8);
+    box-shadow: 0 0 8px rgba(0, 122, 204, 0.4);
 }
 
 .lyrics-content {
-    line-height: 2.2;
-    font-size: 1.1em;
     text-align: center;
+    line-height: 2.5;
+    font-size: 1.2rem;
+    color: #ffffff; /* Testo bianco per contrasto */
+    font-family: 'Roboto', sans-serif; /* Font coerente con il sito */
 }
 
 .lyric-line {
     display: block;
-    margin: 8px 0;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.4s ease;
-    color: #b3b3b3;
+    margin: 12px 0;
+    padding: 12px 20px;
+    border-radius: 10px; /* Bordi arrotondati coerenti */
+    background: rgba(0, 0, 0, 0.2); /* Sfondo simile alle album-card */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
     cursor: pointer;
+    color: #ffffff;
 }
 
 .lyric-line:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(0, 122, 204, 0.8);
+    box-shadow: 0 0 20px rgba(0, 122, 204, 0.4),
+                inset 0 0 15px rgba(0, 122, 204, 0.2);
+    transform: scale(1.02); /* Effetto hover simile alle album-card */
 }
 
-/* Classe per evidenziare la riga corrente dei testi */
+/* Classe per evidenziare la riga corrente - STILE COERENTE */
 .lyric-line.highlight {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(0, 122, 204, 0.8);
     color: #007acc !important;
-    font-weight: 700;
-    font-size: 1.2em;
-    background: linear-gradient(90deg, rgba(0, 122, 204, 0.1) 0%, rgba(0, 153, 255, 0.1) 100%);
-    border-left: 4px solid #007acc;
-    transform: scale(1.02);
-    box-shadow: 0 2px 15px rgba(0, 122, 204, 0.3);
+    font-weight: bold;
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 25px rgba(0, 122, 204, 0.5),
+        inset 0 0 20px rgba(0, 122, 204, 0.2);
+    text-shadow: 0 0 10px #007acc, 
+                 0 0 20px #007acc, 
+                 0 0 30px #007acc; /* Effetto neon come i titoli degli album */
+    font-size: 1.3rem;
+    animation: lyrics-glow 1s ease-in-out;
+}
+
+/* Nuova animazione coerente con il sito */
+@keyframes lyrics-glow {
+    0% { 
+        transform: scale(1.05);
+        text-shadow: 0 0 10px #007acc, 0 0 20px #007acc, 0 0 30px #007acc;
+    }
+    50% { 
+        transform: scale(1.08);
+        text-shadow: 0 0 15px #007acc, 0 0 25px #007acc, 0 0 35px #007acc;
+    }
+    100% { 
+        transform: scale(1.05);
+        text-shadow: 0 0 10px #007acc, 0 0 20px #007acc, 0 0 30px #007acc;
+    }
+}
+
+.lyrics-loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
+    color: #007acc; /* Colore blu coerente */
+    font-size: 1.1rem;
 }
 
 .lyrics-not-found {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 250px;
     text-align: center;
     color: #b3b3b3;
     font-style: italic;
-    padding: 40px 20px;
+    padding: 30px 20px;
+    font-size: 1.1rem;
 }
 
 .lyrics-not-found p {
-    margin: 0;
-    font-size: 1.1em;
+    margin: 8px 0;
+    font-size: 1em;
 }
 
-/* Stile per i controlli di sincronizzazione dei testi */
+/* Controlli sincronizzazione - STILE COERENTE */
 .lyrics-controls {
-    background: rgba(0, 122, 204, 0.1);
-    border-bottom: 1px solid #333;
-    padding: 5px 15px;
+    background: rgba(0, 122, 204, 0.2); /* Stile simile ai pulsanti del sito */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 122, 204, 0.3);
+    color: white;
+    padding: 15px 20px;
+    margin: 0 20px 20px 20px;
+    border-radius: 10px; /* Bordi arrotondati coerenti */
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.lyrics-controls:hover {
+    background: rgba(0, 122, 204, 0.3);
+    border-color: rgba(0, 122, 204, 0.5);
+    box-shadow: 0 0 15px rgba(0, 122, 204, 0.3);
+}
+
+.lyrics-controls strong {
+    color: #007acc; /* Colore blu coerente */
+    text-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+    font-weight: 600;
 }
 
 .lyrics-controls small {
-    font-size: 11px;
-    opacity: 0.8;
+    font-size: 0.8rem;
+    opacity: 0.9;
+    display: block;
+    margin-top: 8px;
+    line-height: 1.4;
 }
 
-/* Responsive design per dispositivi mobili */
+/* Responsive design per dispositivi mobili - COERENTE */
 @media (max-width: 768px) {
     .lyrics-overlay-content {
         width: 95%;
-        max-height: 85vh;
+        max-height: 90vh;
+        margin: 20px;
     }
     
     .lyrics-header {
         padding: 15px 20px;
+        border-radius: 15px 15px 0 0;
     }
     
     .lyrics-header h2 {
-        font-size: 1.2em;
+        font-size: 1.3em;
+    }
+    
+    .lyrics-close-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
     }
     
     .lyrics-container {
         padding: 20px;
-        height: 350px;
+        max-height: 350px;
     }
     
     .lyrics-content {
-        font-size: 1em;
-        line-height: 2;
+        font-size: 1.1rem;
+        line-height: 2.2;
+    }
+    
+    .lyric-line {
+        margin: 10px 0;
+        padding: 10px 15px;
+        font-size: 1rem;
     }
     
     .lyric-line.highlight {
-        font-size: 1.1em;
+        font-size: 1.2rem;
+    }
+    
+    .lyrics-controls {
+        margin: 0 15px 15px 15px;
+        padding: 12px 15px;
+        font-size: 0.85rem;
+    }
+    
+    .lyrics-controls small {
+        font-size: 0.75rem;
+        line-height: 1.3;
     }
 }
