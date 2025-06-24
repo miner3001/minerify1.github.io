@@ -4,7 +4,21 @@
 
 // Recupera tutte le canzoni disponibili dal localStorage (salvate dalla pagina 'Scopri')
 // Questo array conterrà già tutti i metadati e la durata per ogni canzone.
-const ALL_AVAILABLE_SONGS = JSON.parse(localStorage.getItem('allSongsDataStore')) || [];
+let ALL_AVAILABLE_SONGS = JSON.parse(localStorage.getItem('allSongsDataStore')) || [];
+
+// Funzione per normalizzare i percorsi audio (stessa di scopri.js)
+function normalizeAudioSrc(src) {
+    if (src.includes('/music/')) {
+        return src.substring(src.lastIndexOf('/music/') + 1); // Estrae "music/11.mp3"
+    }
+    return src;
+}
+
+// Funzione per ricaricare i dati delle canzoni dal localStorage
+function reloadAvailableSongs() {
+    ALL_AVAILABLE_SONGS = JSON.parse(localStorage.getItem('allSongsDataStore')) || [];
+    console.log('Ricaricate', ALL_AVAILABLE_SONGS.length, 'canzoni disponibili');
+}
 
 // Se hai bisogno di una mappa trackDurations anche qui (meno probabile ora),
 // puoi ricrearla dinamicamente. Altrimenti, puoi accedere direttamente a song.duration.
@@ -449,6 +463,9 @@ function renderMyPlaylist() {
 // --- FUNZIONI DI RICERCA E AGGIUNTA CANZONI ---
 
 function openAddSongSearch() {
+    // Ricarica i dati delle canzoni disponibili
+    reloadAvailableSongs();
+    
     addSongSearchOverlay.classList.add('active');
     searchInput.value = ''; // Pulisci il campo di ricerca
     displaySearchResults(''); // Mostra tutti i brani inizialmente
@@ -460,6 +477,9 @@ function closeAddSongSearch() {
 }
 
 function displaySearchResults(query) {
+    // Ricarica la playlist dal localStorage per essere sicuri di avere i dati aggiornati
+    myPlaylist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
+    
     overlaySongsGrid.innerHTML = '';
     const lowerCaseQuery = query.toLowerCase();
 
@@ -478,9 +498,12 @@ function displaySearchResults(query) {
     filteredSongs.forEach(song => {
         const songCard = document.createElement('div');
         songCard.classList.add('overlay-song-card');
-        
-        // Controlla se la canzone è già nella playlist
-        const isInPlaylist = myPlaylist.some(s => s.src === song.src);
+          // Controlla se la canzone è già nella playlist usando percorsi normalizzati
+        const isInPlaylist = myPlaylist.some(playlistSong => {
+            const normalizedPlaylistSrc = normalizeAudioSrc(playlistSong.src);
+            const normalizedSongSrc = normalizeAudioSrc(song.src);
+            return normalizedPlaylistSrc === normalizedSongSrc;
+        });
         
         songCard.innerHTML = `
             <img src="${song.cover}" alt="Cover" class="overlay-song-cover">

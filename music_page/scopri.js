@@ -122,19 +122,24 @@ function initializeAllSongsData() {
         const songNames = listenNowButton.getAttribute('data-names')?.split(',') || [];
         const albumTitle = album.querySelector('h3')?.textContent || '';
         const artist = album.dataset.artist || '';
-        const cover = album.querySelector('img')?.src || '';
-        songSources.forEach((src, songIdx) => {
-            allSongsData.push({
+        const cover = album.querySelector('img')?.src || '';        songSources.forEach((src, songIdx) => {
+            const songData = {
                 src: src.trim(),
                 name: songNames[songIdx] ? songNames[songIdx].trim() : '',
                 albumName: albumTitle,
                 artist: artist,
                 cover: cover,
                 originalAlbumIndex: albumIdx,
-                originalSongIndexInAlbum: songIdx
-            });
+                originalSongIndexInAlbum: songIdx,
+                duration: trackDurations[src.trim()] || 0
+            };
+            allSongsData.push(songData);
         });
     });
+    
+    // Salva i dati delle canzoni nel localStorage per la pagina playlist
+    localStorage.setItem('allSongsDataStore', JSON.stringify(allSongsData));
+    
     logEvent('SUCCESS', `Caricate ${allSongsData.length} canzoni da ${albumCards.length} album`);
 }
 
@@ -170,9 +175,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Funzione per salvare i preferiti nel localStorage
     function saveFavorites() {
         localStorage.setItem('likedSongs', JSON.stringify(likedSongs));
-    }
-
-    // Funzione per aggiornare il cuoricino
+    }    // Funzione per aggiornare il cuoricino
     function updateLikeButton() {
         const currentSongSrc = audioPlayer.src;
         const isLiked = likedSongs.some(song => song.src === currentSongSrc);
@@ -225,9 +228,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             isPlaying = false;
                             playPauseButton.innerHTML = '<i class="bi bi-play-fill"></i>';
                         });
-                }
-
-                updateLikeButton();
+                }                updateLikeButton();
+                updatePlaylistButton();
                 updateShuffleLoopButtons();
             }
         } catch (error) {
@@ -283,9 +285,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (isShuffle) {
                 shuffleHistory.push(songData.src);
                 if (shuffleHistory.length > MAX_SHUFFLE_HISTORY) shuffleHistory.shift();
-                logEvent('PLAYER', 'Canzone aggiunta alla cronologia shuffle');
-            }
+                logEvent('PLAYER', 'Canzone aggiunta alla cronologia shuffle');            }
             updateLikeButton();
+            updatePlaylistButton();
             savePlayerState();
             
             logEvent('SUCCESS', 'Riproduzione audio avviata con successo');
@@ -517,8 +519,8 @@ document.addEventListener('DOMContentLoaded', function () {
             likedSongs.push({ src: currentSongSrc, name: currentSongName, cover: currentSongCover });
         }
 
-        saveFavorites();
-        updateLikeButton();
+        saveFavorites();        updateLikeButton();
+        updatePlaylistButton();
     });
 
     // Listener per aggiornare la barra di progresso e il tempo
@@ -631,10 +633,9 @@ document.addEventListener('DOMContentLoaded', function () {
     audioPlayer.addEventListener('pause', savePlayerState);
     audioPlayer.addEventListener('loadedmetadata', function() {
         updateProgressBar();
-    });
-
-    // Aggiorna il cuoricino all'avvio
+    });    // Aggiorna il cuoricino all'avvio
     updateLikeButton();
+    updatePlaylistButton();
 
     // Inizializza la barra di ricerca
     initializeSearch();
@@ -645,11 +646,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Nasconde loader quando l'audio è pronto
     audioPlayer.addEventListener('canplaythrough', function () {
         document.getElementById('audio-loading').style.display = 'none';
-    });
-    // Nasconde loader anche in caso di errore
+    });    // Nasconde loader anche in caso di errore
     audioPlayer.addEventListener('error', function () {
         document.getElementById('audio-loading').style.display = 'none';
     });
+
+    // Gestione del pulsante "Aggiungi alla playlist"
+    const addToPlaylistButton = document.getElementById('add-to-playlist-button');
+    if (addToPlaylistButton) {
+        addToPlaylistButton.addEventListener('click', function() {
+            addCurrentSongToPlaylist();
+        });
+        logEvent('SUCCESS', 'Event listener add-to-playlist configurato');
+    } else {
+        logEvent('ERROR', 'Pulsante add-to-playlist non trovato nel DOM');
+    }
 });
 
 // Mappa delle durate delle tracce (secondi) per ogni file audio
@@ -1143,17 +1154,46 @@ function setCurrentAlbumContextFromSong(songData) {
     
 }
 
-// Gestione del pulsante "Aggiungi alla playlist"
-const addToPlaylistButton = document.getElementById('add-to-playlist-button');
-if (addToPlaylistButton) {
-    addToPlaylistButton.addEventListener('click', function() {
-        addCurrentSongToPlaylist();
+// Funzione helper per normalizzare i percorsi audio
+function normalizeAudioSrc(src) {
+    if (src.includes('/music/')) {
+        return src.substring(src.lastIndexOf('/music/') + 1); // Estrae "music/11.mp3"
+    }
+    return src;
+}
+
+// Funzione per aggiornare il pulsante playlist
+function updatePlaylistButton() {
+    const addToPlaylistButton = document.getElementById('add-to-playlist-button');
+    const audioPlayer = document.getElementById('audio-player');
+    
+    if (!addToPlaylistButton || !audioPlayer || !audioPlayer.src) return;
+    
+    const myPlaylist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
+    const normalizedCurrentSrc = normalizeAudioSrc(audioPlayer.src);
+    
+    const isInPlaylist = myPlaylist.some(song => {
+        const normalizedPlaylistSrc = normalizeAudioSrc(song.src);
+        return normalizedPlaylistSrc === normalizedCurrentSrc;
     });
+    
+    if (isInPlaylist) {
+        addToPlaylistButton.style.color = '#1ed760'; // Verde se in playlist
+        addToPlaylistButton.title = 'Canzone già in playlist';
+    } else {
+        addToPlaylistButton.style.color = ''; // Colore normale
+        addToPlaylistButton.title = 'Aggiungi alla mia playlist';
+    }
 }
 
 // Funzione per aggiungere la canzone corrente alla playlist
 function addCurrentSongToPlaylist() {
-    if (!audioPlayer.src) {
+    const audioPlayer = document.getElementById('audio-player');
+    const currentSong = document.getElementById('current-song');
+    const currentAlbumCover = document.getElementById('current-album-cover');
+    const addToPlaylistButton = document.getElementById('add-to-playlist-button');
+
+    if (!audioPlayer || !audioPlayer.src || currentSong.textContent === 'Nessuna canzone in riproduzione') {
         alert('Nessuna canzone in riproduzione');
         return;
     }
@@ -1161,46 +1201,71 @@ function addCurrentSongToPlaylist() {
     // Recupera la playlist dal localStorage
     let myPlaylist = JSON.parse(localStorage.getItem('myPlaylist')) || [];
     
-    // Controlla se la canzone è già nella playlist
-    const songAlreadyExists = myPlaylist.some(song => song.src === audioPlayer.src);
+    const normalizedCurrentSrc = normalizeAudioSrc(audioPlayer.src);
+    
+    // Controlla se la canzone è già nella playlist usando il percorso normalizzato
+    const songAlreadyExists = myPlaylist.some(song => {
+        const normalizedPlaylistSrc = normalizeAudioSrc(song.src);
+        return normalizedPlaylistSrc === normalizedCurrentSrc;
+    });
     
     if (songAlreadyExists) {
         alert('Questa canzone è già nella tua playlist!');
         return;
     }
 
-    // Trova i dati della canzone corrente
-    const currentSongData = allSongsData.find(song => song.src === audioPlayer.src);
+    // Trova i dati della canzone corrente da allSongsData usando percorsi normalizzati
+    const currentSongData = allSongsData.find(song => {
+        const normalizedSongSrc = normalizeAudioSrc(song.src);
+        return normalizedSongSrc === normalizedCurrentSrc;
+    });
+    
+    logEvent('INFO', 'Ricerca canzone in allSongsData', {
+        originalSrc: audioPlayer.src,
+        normalizedSrc: normalizedCurrentSrc,
+        found: !!currentSongData
+    });
     
     if (currentSongData) {
-        // Aggiungi la canzone alla playlist
+        // Crea l'oggetto canzone con tutti i dati necessari per la playlist
         const songToAdd = {
             src: currentSongData.src,
             name: currentSongData.name,
-            artist: currentSongData.artist,
-            albumName: currentSongData.albumName,
-            cover: currentSongData.cover,
-            duration: audioPlayer.duration || 0
+            artist: currentSongData.artist || 'Artista Sconosciuto',
+            albumName: currentSongData.albumName || '',
+            cover: currentSongData.cover || currentAlbumCover.src,
+            duration: audioPlayer.duration || trackDurations[currentSongData.src] || 0
         };
         
         myPlaylist.push(songToAdd);
-        
-        // Salva la playlist aggiornata nel localStorage
+          // Salva la playlist aggiornata nel localStorage
         localStorage.setItem('myPlaylist', JSON.stringify(myPlaylist));
         
-        // Mostra un feedback visivo
-        alert('Canzone aggiunta alla tua playlist!');
+        // Aggiorna anche i dati per la pagina playlist
+        localStorage.setItem('allSongsDataStore', JSON.stringify(allSongsData));
         
-        // Effetto visivo sul pulsante
-        addToPlaylistButton.style.color = '#1ed760';
-        addToPlaylistButton.style.transform = 'scale(1.2)';
+        // Log per debug
+        logEvent('SUCCESS', 'Canzone aggiunta alla playlist', {
+            song: songToAdd.name,
+            artist: songToAdd.artist,
+            playlistLength: myPlaylist.length
+        });
+          // Mostra un feedback visivo
+        alert(`"${songToAdd.name}" è stata aggiunta alla tua playlist!`);
         
-        setTimeout(() => {
-            addToPlaylistButton.style.color = '#1db954';
-            addToPlaylistButton.style.transform = 'scale(1)';
-        }, 300);
+        // Aggiorna il pulsante per mostrare che la canzone è ora in playlist
+        updatePlaylistButton();
+        
+        // Effetto visivo temporaneo sul pulsante
+        if (addToPlaylistButton) {
+            addToPlaylistButton.style.transform = 'scale(1.2)';
+            setTimeout(() => {
+                addToPlaylistButton.style.transform = 'scale(1)';
+            }, 300);
+        }
     } else {
-        alert('Errore: impossibile trovare i dati della canzone');
+        logEvent('ERROR', 'Dati canzone non trovati in allSongsData', { src: audioPlayer.src });
+        alert('Errore nell\'aggiungere la canzone alla playlist');
     }
 }
 
