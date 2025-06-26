@@ -1472,6 +1472,7 @@ function showLyricsLoading() {
 }
 
 /**
+
  * Mostra il messaggio quando i testi non sono trovati
  */
 function showLyricsNotFound() {
@@ -2004,6 +2005,852 @@ if (lyricsOverlay) {
 logEvent('SUCCESS', '=== SISTEMA DI LOGGING ATTIVATO ===');
 logEvent('INFO', 'Tutti gli eventi verranno tracciati nella console del browser');
 logEvent('INFO', 'Per attivare i log su schermo, cambia LOG_CONFIG.logToScreen = true');
+
+// === EQUALIZZATORE AUDIO SYSTEM ===
+
+class AudioEqualizer {
+    constructor() {
+        this.audioContext = null;
+        this.sourceNode = null;
+        this.currentAudioElement = null;
+        this.filters = [];
+        this.bassFilter = null;
+        this.trebleFilter = null;
+        this.reverbNode = null;
+        this.echoNode = null;
+        this.echoDelayNode = null;
+        this.echoFeedbackNode = null;
+        this.analyser = null;
+        this.spectrumCanvas = null;
+        this.spectrumContext = null;
+        this.animationId = null;
+        this.isEnabled = false;
+        
+        // Configurazione delle frequenze
+        this.frequencies = [60, 170, 310, 600, 1000, 3000, 6000, 12000, 14000, 16000];
+        
+        // Preset predefiniti (valori in dB)
+        this.presets = {
+            'normale': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            'rock': [4, 3, -1, -1, 0, 1, 3, 4, 4, 4],
+            'pop': [2, 1, 0, -1, -1, 0, 1, 2, 3, 3],
+            'jazz': [3, 2, 1, 0, -1, -1, 0, 1, 2, 3],
+            'classica': [3, 2, 1, 0, 0, 0, -1, -2, -2, -2],
+            'elettronica': [5, 4, 2, 0, -1, 1, 2, 3, 4, 5],
+            'bass-boost': [6, 5, 4, 2, 0, 0, 0, 0, 0, 0],
+            'vocal': [-2, -1, 0, 2, 4, 4, 3, 1, 0, -1]
+        };
+        
+        this.currentSettings = {
+            frequencies: [...this.presets.normale],
+            bass: 0,
+            treble: 0,
+            reverb: { enabled: false, type: 'room', mix: 30 },
+            echo: { enabled: false, delay: 250, feedback: 25, mix: 20 }
+        };
+        
+        this.init();
+    }
+    
+    async init() {
+        try {
+            logEvent('INFO', '🎛️ Inizializzazione equalizzatore audio...');
+            
+            // Crea AudioContext
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Inizializza canvas per analizzatore di spettro
+            this.spectrumCanvas = document.getElementById('spectrum-canvas');
+            if (this.spectrumCanvas) {
+                this.spectrumContext = this.spectrumCanvas.getContext('2d');
+            }
+            
+            // Carica impostazioni salvate
+            this.loadSettings();
+            
+            // Configura UI
+            this.setupUI();
+            
+            logEvent('SUCCESS', '🎛️ Equalizzatore inizializzato con successo');
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore inizializzazione equalizzatore:', error);
+        }
+    }
+    
+    setupAudio(audioElement) {
+        try {
+            if (!this.audioContext) return;
+            
+            logEvent('INFO', '🔊 Configurazione catena audio...');
+            
+            // Controlla se abbiamo già un source node per questo elemento
+            if (this.currentAudioElement === audioElement && this.sourceNode) {
+                logEvent('INFO', '🔊 Riutilizzo source node esistente');
+                this.updateFiltersSettings();
+                return;
+            }
+            
+            // Rimuovi configurazione precedente solo se necessario
+            if (this.sourceNode && this.currentAudioElement !== audioElement) {
+                this.disconnect();
+            }
+            
+            // Salva riferimento all'elemento audio corrente
+            this.currentAudioElement = audioElement;
+            
+            // Crea source node solo se non esiste o è per un elemento diverso
+            if (!this.sourceNode) {
+                this.sourceNode = this.audioContext.createMediaElementSource(audioElement);
+            }
+            
+            // Crea filtri per ogni frequenza solo se non esistono
+            if (!this.filters || this.filters.length === 0) {
+                this.filters = this.frequencies.map((freq, index) => {
+                    const filter = this.audioContext.createBiquadFilter();
+                    filter.type = 'peaking';
+                    filter.frequency.value = freq;
+                    filter.Q.value = 1;
+                    filter.gain.value = this.currentSettings.frequencies[index];
+                    return filter;
+                });
+            }
+            
+            // Crea filtri bass e treble solo se non esistono
+            if (!this.bassFilter) {
+                this.bassFilter = this.audioContext.createBiquadFilter();
+                this.bassFilter.type = 'lowshelf';
+                this.bassFilter.frequency.value = 100;
+                this.bassFilter.gain.value = this.currentSettings.bass;
+            }
+            
+            if (!this.trebleFilter) {
+                this.trebleFilter = this.audioContext.createBiquadFilter();
+                this.trebleFilter.type = 'highshelf';
+                this.trebleFilter.frequency.value = 10000;
+                this.trebleFilter.gain.value = this.currentSettings.treble;
+            }
+            
+            // Crea analizzatore solo se non esiste
+            if (!this.analyser) {
+                this.analyser = this.audioContext.createAnalyser();
+                this.analyser.fftSize = 256;
+            }
+            
+            // Crea nodi per effetti solo se non esistono
+            if (!this.reverbNode) {
+                this.setupEffects();
+            }
+            
+            // Connetti la catena audio
+            this.connectAudioChain();
+            
+            // Aggiorna le impostazioni dei filtri
+            this.updateFiltersSettings();
+            
+            this.isEnabled = true;
+            logEvent('SUCCESS', '🔊 Catena audio configurata');
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore configurazione audio:', error);
+        }
+    }
+    
+    updateFiltersSettings() {
+        try {
+            // Aggiorna filtri delle frequenze
+            this.filters.forEach((filter, index) => {
+                if (filter && this.currentSettings.frequencies[index] !== undefined) {
+                    filter.gain.value = this.currentSettings.frequencies[index];
+                }
+            });
+            
+            // Aggiorna bass e treble
+            if (this.bassFilter) {
+                this.bassFilter.gain.value = this.currentSettings.bass;
+            }
+            
+            if (this.trebleFilter) {
+                this.trebleFilter.gain.value = this.currentSettings.treble;
+            }
+            
+            // Aggiorna effetti
+            this.updateReverbGain();
+            this.updateEchoGain();
+            
+            logEvent('SUCCESS', '🔧 Impostazioni filtri aggiornate');
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore aggiornamento filtri:', error);
+        }
+    }
+    
+    async setupEffects() {
+        try {
+            // Setup Reverb
+            this.reverbNode = this.audioContext.createConvolver();
+            this.reverbGain = this.audioContext.createGain();
+            this.reverbGain.gain.value = 0;
+            
+            // Carica impulse response per reverb
+            await this.loadReverbImpulse(this.currentSettings.reverb.type);
+            
+            // Setup Echo
+            this.echoDelayNode = this.audioContext.createDelay(1.0);
+            this.echoFeedbackNode = this.audioContext.createGain();
+            this.echoMixNode = this.audioContext.createGain();
+            
+            this.echoDelayNode.delayTime.value = this.currentSettings.echo.delay / 1000;
+            this.echoFeedbackNode.gain.value = this.currentSettings.echo.feedback / 100;
+            this.echoMixNode.gain.value = this.currentSettings.echo.mix / 100;
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore setup effetti:', error);
+        }
+    }
+    
+    async loadReverbImpulse(type) {
+        try {
+            // Genera impulse response sintetico per diversi tipi di reverb
+            const length = this.audioContext.sampleRate * (type === 'cathedral' ? 4 : type === 'hall' ? 2 : 1);
+            const impulse = this.audioContext.createBuffer(2, length, this.audioContext.sampleRate);
+            
+            for (let channel = 0; channel < 2; channel++) {
+                const channelData = impulse.getChannelData(channel);
+                for (let i = 0; i < length; i++) {
+                    const decay = Math.pow(1 - i / length, type === 'cathedral' ? 2 : type === 'hall' ? 1.5 : 1);
+                    channelData[i] = (Math.random() * 2 - 1) * decay;
+                }
+            }
+            
+            this.reverbNode.buffer = impulse;
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore caricamento reverb:', error);
+        }
+    }
+    
+    connectAudioChain() {
+        if (!this.sourceNode) return;
+        
+        try {
+            let currentNode = this.sourceNode;
+            
+            // Connetti filtri delle frequenze in serie
+            this.filters.forEach(filter => {
+                currentNode.connect(filter);
+                currentNode = filter;
+            });
+            
+            // Connetti bass e treble
+            currentNode.connect(this.bassFilter);
+            this.bassFilter.connect(this.trebleFilter);
+            
+            // Branch per effetti
+            const mainGain = this.audioContext.createGain();
+            this.trebleFilter.connect(mainGain);
+            
+            // Reverb branch
+            if (this.reverbNode && this.reverbGain) {
+                this.trebleFilter.connect(this.reverbNode);
+                this.reverbNode.connect(this.reverbGain);
+                this.reverbGain.connect(mainGain);
+            }
+            
+            // Echo branch
+            if (this.echoDelayNode && this.echoFeedbackNode && this.echoMixNode) {
+                this.trebleFilter.connect(this.echoDelayNode);
+                this.echoDelayNode.connect(this.echoFeedbackNode);
+                this.echoFeedbackNode.connect(this.echoDelayNode);
+                this.echoDelayNode.connect(this.echoMixNode);
+                this.echoMixNode.connect(mainGain);
+            }
+            
+            // Connetti all'analizzatore e al destination
+            mainGain.connect(this.analyser);
+            this.analyser.connect(this.audioContext.destination);
+            
+            logEvent('SUCCESS', '🔗 Catena audio connessa');
+            
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore connessione catena audio:', error);
+        }
+    }
+    
+    disconnect() {
+        try {
+            // Non disconnettere il source node a meno che non sia strettamente necessario
+            // Disconnetti solo i filtri e gli effetti
+            this.filters.forEach(filter => {
+                if (filter) filter.disconnect();
+            });
+            if (this.bassFilter) this.bassFilter.disconnect();
+            if (this.trebleFilter) this.trebleFilter.disconnect();
+            if (this.reverbNode) this.reverbNode.disconnect();
+            if (this.reverbGain) this.reverbGain.disconnect();
+            if (this.echoDelayNode) this.echoDelayNode.disconnect();
+            if (this.echoFeedbackNode) this.echoFeedbackNode.disconnect();
+            if (this.echoMixNode) this.echoMixNode.disconnect();
+            if (this.analyser) this.analyser.disconnect();
+            
+            logEvent('INFO', '🔌 Nodi audio disconnessi');
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore disconnessione:', error);
+        }
+    }
+    
+    fullDisconnect() {
+        try {
+            // Disconnessione completa per cleanup finale
+            if (this.sourceNode) {
+                this.sourceNode.disconnect();
+                this.sourceNode = null;
+            }
+            this.disconnect();
+            this.currentAudioElement = null;
+            this.filters = [];
+            this.bassFilter = null;
+            this.trebleFilter = null;
+            this.reverbNode = null;
+            this.reverbGain = null;
+            this.echoDelayNode = null;
+            this.echoFeedbackNode = null;
+            this.echoMixNode = null;
+            this.analyser = null;
+            
+            logEvent('INFO', '🔌 Disconnessione completa effettuata');
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore disconnessione completa:', error);
+        }
+    }
+    
+    setupUI() {
+        const panel = document.getElementById('equalizer-panel');
+        const button = document.getElementById('equalizer-button');
+        const closeBtn = document.getElementById('eq-close-btn');
+        const resetBtn = document.getElementById('eq-reset-btn');
+        const saveBtn = document.getElementById('save-preset-btn');
+        const presetSelector = document.getElementById('preset-selector');
+        
+        // Toggle panel
+        if (button) {
+            button.addEventListener('click', () => {
+                this.togglePanel();
+            });
+        }
+        
+        // Close panel
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                this.hidePanel();
+            });
+        }
+        
+        // Reset equalizzatore
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.resetEqualizer();
+            });
+        }
+        
+        // Salva preset
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                this.saveCustomPreset();
+            });
+        }
+        
+        // Cambia preset
+        if (presetSelector) {
+            presetSelector.addEventListener('change', (e) => {
+                this.applyPreset(e.target.value);
+            });
+        }
+        
+        // Setup sliders frequenze
+        this.setupFrequencySliders();
+        
+        // Setup bass/treble knobs
+        this.setupBassTreeble();
+        
+        // Setup effetti
+        this.setupEffectsUI();
+        
+        // Avvia analizzatore di spettro
+        this.startSpectrumAnalyzer();
+    }
+    
+    setupFrequencySliders() {
+        const sliders = document.querySelectorAll('.freq-slider');
+        sliders.forEach((slider, index) => {
+            const valueSpan = slider.parentElement.querySelector('.freq-value');
+            
+            // Imposta valore iniziale
+            slider.value = this.currentSettings.frequencies[index];
+            if (valueSpan) {
+                valueSpan.textContent = `${this.currentSettings.frequencies[index]}dB`;
+            }
+            
+            // Event listener
+            slider.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.currentSettings.frequencies[index] = value;
+                
+                if (valueSpan) {
+                    valueSpan.textContent = `${value}dB`;
+                }
+                
+                // Applica filtro
+                if (this.filters[index]) {
+                    this.filters[index].gain.value = value;
+                }
+                
+                this.saveSettings();
+                logEvent('AUDIO', `Frequenza ${this.frequencies[index]}Hz: ${value}dB`);
+            });
+        });
+    }
+    
+    setupBassTreeble() {
+        const bassKnob = document.getElementById('bass-knob');
+        const trebleKnob = document.getElementById('treble-knob');
+        const bassValue = document.getElementById('bass-value');
+        const trebleValue = document.getElementById('treble-value');
+        
+        // Bass
+        if (bassKnob && bassValue) {
+            bassKnob.value = this.currentSettings.bass;
+            bassValue.textContent = `${this.currentSettings.bass}dB`;
+            
+            bassKnob.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.currentSettings.bass = value;
+                bassValue.textContent = `${value}dB`;
+                
+                if (this.bassFilter) {
+                    this.bassFilter.gain.value = value;
+                }
+                
+                this.saveSettings();
+                logEvent('AUDIO', `Bass: ${value}dB`);
+            });
+        }
+        
+        // Treble
+        if (trebleKnob && trebleValue) {
+            trebleKnob.value = this.currentSettings.treble;
+            trebleValue.textContent = `${this.currentSettings.treble}dB`;
+            
+            trebleKnob.addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.currentSettings.treble = value;
+                trebleValue.textContent = `${value}dB`;
+                
+                if (this.trebleFilter) {
+                    this.trebleFilter.gain.value = value;
+                }
+                
+                this.saveSettings();
+                logEvent('AUDIO', `Treble: ${value}dB`);
+            });
+        }
+    }
+    
+    setupEffectsUI() {
+        // Reverb
+        const reverbToggle = document.getElementById('reverb-toggle');
+        const reverbControls = document.getElementById('reverb-controls');
+        const reverbType = document.getElementById('reverb-type');
+        const reverbMix = document.getElementById('reverb-mix');
+        const reverbMixValue = document.getElementById('reverb-mix-value');
+        
+        if (reverbToggle) {
+            reverbToggle.checked = this.currentSettings.reverb.enabled;
+            if (reverbControls) {
+                reverbControls.classList.toggle('active', this.currentSettings.reverb.enabled);
+            }
+            
+            reverbToggle.addEventListener('change', (e) => {
+                this.currentSettings.reverb.enabled = e.target.checked;
+                if (reverbControls) {
+                    reverbControls.classList.toggle('active', e.target.checked);
+                }
+                this.updateReverbGain();
+                this.saveSettings();
+                logEvent('AUDIO', `Reverb: ${e.target.checked ? 'ON' : 'OFF'}`);
+            });
+        }
+        
+        if (reverbType) {
+            reverbType.value = this.currentSettings.reverb.type;
+            reverbType.addEventListener('change', (e) => {
+                this.currentSettings.reverb.type = e.target.value;
+                this.loadReverbImpulse(e.target.value);
+                this.saveSettings();
+                logEvent('AUDIO', `Reverb Type: ${e.target.value}`);
+            });
+        }
+        
+        if (reverbMix && reverbMixValue) {
+            reverbMix.value = this.currentSettings.reverb.mix;
+            reverbMixValue.textContent = `${this.currentSettings.reverb.mix}%`;
+            
+            reverbMix.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.currentSettings.reverb.mix = value;
+                reverbMixValue.textContent = `${value}%`;
+                this.updateReverbGain();
+                this.saveSettings();
+            });
+        }
+        
+        // Echo
+        const echoToggle = document.getElementById('echo-toggle');
+        const echoControls = document.getElementById('echo-controls');
+        const echoDelay = document.getElementById('echo-delay');
+        const echoDelayValue = document.getElementById('echo-delay-value');
+        const echoFeedback = document.getElementById('echo-feedback');
+        const echoFeedbackValue = document.getElementById('echo-feedback-value');
+        const echoMix = document.getElementById('echo-mix');
+        const echoMixValue = document.getElementById('echo-mix-value');
+        
+        if (echoToggle) {
+            echoToggle.checked = this.currentSettings.echo.enabled;
+            if (echoControls) {
+                echoControls.classList.toggle('active', this.currentSettings.echo.enabled);
+            }
+            
+            echoToggle.addEventListener('change', (e) => {
+                this.currentSettings.echo.enabled = e.target.checked;
+                if (echoControls) {
+                    echoControls.classList.toggle('active', e.target.checked);
+                }
+                this.updateEchoGain();
+                this.saveSettings();
+                logEvent('AUDIO', `Echo: ${e.target.checked ? 'ON' : 'OFF'}`);
+            });
+        }
+        
+        if (echoDelay && echoDelayValue) {
+            echoDelay.value = this.currentSettings.echo.delay;
+            echoDelayValue.textContent = `${this.currentSettings.echo.delay}ms`;
+            
+            echoDelay.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.currentSettings.echo.delay = value;
+                echoDelayValue.textContent = `${value}ms`;
+                
+                if (this.echoDelayNode) {
+                    this.echoDelayNode.delayTime.value = value / 1000;
+                }
+                
+                this.saveSettings();
+            });
+        }
+        
+        if (echoFeedback && echoFeedbackValue) {
+            echoFeedback.value = this.currentSettings.echo.feedback;
+            echoFeedbackValue.textContent = `${this.currentSettings.echo.feedback}%`;
+            
+            echoFeedback.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.currentSettings.echo.feedback = value;
+                echoFeedbackValue.textContent = `${value}%`;
+                
+                if (this.echoFeedbackNode) {
+                    this.echoFeedbackNode.gain.value = value / 100;
+                }
+                
+                this.saveSettings();
+            });
+        }
+        
+        if (echoMix && echoMixValue) {
+            echoMix.value = this.currentSettings.echo.mix;
+            echoMixValue.textContent = `${this.currentSettings.echo.mix}%`;
+            
+            echoMix.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                this.currentSettings.echo.mix = value;
+                echoMixValue.textContent = `${value}%`;
+                
+                if (this.echoMixNode) {
+                    this.echoMixNode.gain.value = value / 100;
+                }
+                
+                this.saveSettings();
+            });
+        }
+    }
+    
+    updateReverbGain() {
+        if (this.reverbGain) {
+            const gain = this.currentSettings.reverb.enabled ? this.currentSettings.reverb.mix / 100 : 0;
+            this.reverbGain.gain.value = gain;
+        }
+    }
+    
+    updateEchoGain() {
+        if (this.echoMixNode) {
+            const gain = this.currentSettings.echo.enabled ? this.currentSettings.echo.mix / 100 : 0;
+            this.echoMixNode.gain.value = gain;
+        }
+    }
+    
+    startSpectrumAnalyzer() {
+        if (!this.spectrumCanvas || !this.spectrumContext) return;
+        
+        const draw = () => {
+            if (!this.analyser) {
+                this.animationId = requestAnimationFrame(draw);
+                return;
+            }
+            
+            const bufferLength = this.analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            this.analyser.getByteFrequencyData(dataArray);
+            
+            const { width, height } = this.spectrumCanvas;
+            
+            this.spectrumContext.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            this.spectrumContext.fillRect(0, 0, width, height);
+            
+            const barWidth = width / bufferLength * 2.5;
+            let barHeight;
+            let x = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = (dataArray[i] / 255) * height;
+                
+                const hue = (i / bufferLength) * 360;
+                this.spectrumContext.fillStyle = `hsl(${hue}, 70%, 60%)`;
+                
+                this.spectrumContext.fillRect(x, height - barHeight, barWidth, barHeight);
+                x += barWidth + 1;
+            }
+            
+            this.animationId = requestAnimationFrame(draw);
+        };
+        
+        draw();
+    }
+    
+    togglePanel() {
+        const panel = document.getElementById('equalizer-panel');
+        const button = document.getElementById('equalizer-button');
+        
+        if (panel) {
+            const isVisible = panel.classList.contains('show');
+            
+            if (isVisible) {
+                this.hidePanel();
+            } else {
+                this.showPanel();
+            }
+        }
+    }
+    
+    showPanel() {
+        const panel = document.getElementById('equalizer-panel');
+        const button = document.getElementById('equalizer-button');
+        
+        if (panel) {
+            panel.classList.add('show');
+        }
+        
+        if (button) {
+            button.classList.add('active');
+        }
+        
+        logEvent('UI', '🎛️ Pannello equalizzatore aperto');
+    }
+    
+    hidePanel() {
+        const panel = document.getElementById('equalizer-panel');
+        const button = document.getElementById('equalizer-button');
+        
+        if (panel) {
+            panel.classList.remove('show');
+        }
+        
+        if (button) {
+            button.classList.remove('active');
+        }
+        
+        logEvent('UI', '🎛️ Pannello equalizzatore chiuso');
+    }
+    
+    applyPreset(presetName) {
+        if (!this.presets[presetName]) return;
+        
+        logEvent('AUDIO', `🎯 Applicazione preset: ${presetName}`);
+        
+        const presetValues = [...this.presets[presetName]];
+        this.currentSettings.frequencies = presetValues;
+        
+        // Aggiorna UI
+        const sliders = document.querySelectorAll('.freq-slider');
+        sliders.forEach((slider, index) => {
+            slider.value = presetValues[index];
+            const valueSpan = slider.parentElement.querySelector('.freq-value');
+            if (valueSpan) {
+                valueSpan.textContent = `${presetValues[index]}dB`;
+            }
+        });
+        
+        // Applica ai filtri
+        this.filters.forEach((filter, index) => {
+            if (filter) {
+                filter.gain.value = presetValues[index];
+            }
+        });
+        
+        this.saveSettings();
+        logEvent('SUCCESS', `✅ Preset '${presetName}' applicato`);
+    }
+    
+    resetEqualizer() {
+        logEvent('AUDIO', '🔄 Reset equalizzatore');
+        
+        this.applyPreset('normale');
+        
+        // Reset bass/treble
+        this.currentSettings.bass = 0;
+        this.currentSettings.treble = 0;
+        
+        const bassKnob = document.getElementById('bass-knob');
+        const trebleKnob = document.getElementById('treble-knob');
+        const bassValue = document.getElementById('bass-value');
+        const trebleValue = document.getElementById('treble-value');
+        
+        if (bassKnob && bassValue) {
+            bassKnob.value = 0;
+            bassValue.textContent = '0dB';
+        }
+        
+        if (trebleKnob && trebleValue) {
+            trebleKnob.value = 0;
+            trebleValue.textContent = '0dB';
+        }
+        
+        if (this.bassFilter) this.bassFilter.gain.value = 0;
+        if (this.trebleFilter) this.trebleFilter.gain.value = 0;
+        
+        // Reset effetti
+        this.currentSettings.reverb.enabled = false;
+        this.currentSettings.echo.enabled = false;
+        
+        const reverbToggle = document.getElementById('reverb-toggle');
+        const echoToggle = document.getElementById('echo-toggle');
+        const reverbControls = document.getElementById('reverb-controls');
+        const echoControls = document.getElementById('echo-controls');
+        
+        if (reverbToggle) reverbToggle.checked = false;
+        if (echoToggle) echoToggle.checked = false;
+        if (reverbControls) reverbControls.classList.remove('active');
+        if (echoControls) echoControls.classList.remove('active');
+        
+        this.updateReverbGain();
+        this.updateEchoGain();
+        
+        // Reset preset selector
+        const presetSelector = document.getElementById('preset-selector');
+        if (presetSelector) {
+            presetSelector.value = 'normale';
+        }
+        
+        this.saveSettings();
+        logEvent('SUCCESS', '✅ Equalizzatore resettato');
+    }
+    
+    saveCustomPreset() {
+        const name = prompt('Nome del preset personalizzato:');
+        if (!name) return;
+        
+        const customPresets = JSON.parse(localStorage.getItem('minerify_custom_presets') || '{}');
+        customPresets[name] = [...this.currentSettings.frequencies];
+        
+        localStorage.setItem('minerify_custom_presets', JSON.stringify(customPresets));
+        
+        // Aggiungi alla select
+        const presetSelector = document.getElementById('preset-selector');
+        if (presetSelector) {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            presetSelector.appendChild(option);
+        }
+        
+        logEvent('SUCCESS', `💾 Preset '${name}' salvato`);
+    }
+    
+    loadSettings() {
+        try {
+            const saved = localStorage.getItem('minerify_equalizer_settings');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                this.currentSettings = { ...this.currentSettings, ...settings };
+                logEvent('SUCCESS', '⚙️ Impostazioni equalizzatore caricate');
+            }
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore caricamento impostazioni:', error);
+        }
+    }
+    
+    saveSettings() {
+        try {
+            localStorage.setItem('minerify_equalizer_settings', JSON.stringify(this.currentSettings));
+        } catch (error) {
+            logEvent('ERROR', '❌ Errore salvataggio impostazioni:', error);
+        }
+    }
+    
+    destroy() {
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+        this.fullDisconnect();
+        if (this.audioContext && this.audioContext.state !== 'closed') {
+            this.audioContext.close();
+        }
+    }
+}
+
+// Istanza globale dell'equalizzatore
+let audioEqualizer = null;
+
+// Inizializza equalizzatore al caricamento
+document.addEventListener('DOMContentLoaded', () => {
+    audioEqualizer = new AudioEqualizer();
+});
+
+// Integrazione con il player esistente
+const originalAudioPlayer = document.getElementById('audio-player');
+if (originalAudioPlayer) {
+    // Usa 'canplay' invece di 'loadstart' per evitare chiamate multiple
+    originalAudioPlayer.addEventListener('canplay', () => {
+        if (audioEqualizer && audioEqualizer.audioContext) {
+            audioEqualizer.setupAudio(originalAudioPlayer);
+        }
+    });
+    
+    // Gestisci il cambio di sorgente
+    originalAudioPlayer.addEventListener('loadstart', () => {
+        logEvent('INFO', '🔄 Nuova canzone caricata, preparazione equalizzatore...');
+    });
+    
+    // Resume AudioContext su user interaction
+    const resumeAudioContext = () => {
+        if (audioEqualizer && audioEqualizer.audioContext && audioEqualizer.audioContext.state === 'suspended') {
+            audioEqualizer.audioContext.resume().then(() => {
+                logEvent('SUCCESS', '🔊 AudioContext riattivato');
+            });
+        }
+    };
+    
+    originalAudioPlayer.addEventListener('play', resumeAudioContext);
+    document.addEventListener('click', resumeAudioContext, { once: true });
+}
 
 // Log di benvenuto
 setTimeout(() => {

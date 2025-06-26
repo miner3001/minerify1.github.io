@@ -120,7 +120,7 @@
                 <h3>Reinsertado - Morad</h3>
                 <button class="listen-now"
                     data-src="music/114.mp3,music/115.mp3,music/116.mp3,music/117.mp3,music/118.mp3,music/119.mp3,music/120.mp3,music/121.mp3,music/122.mp3,music/123.mp3,music/124.mp3,music/125.mp3,music/126.mp3,music/127.mp3,music/128.mp3,music/129.mp3,music/130.mp3,music/131.mp3,music/132.mp3"
-                    data-names="Cristales, Paz, Mi Barrio, No Estuviste En Lo Malo, Andando, Soledad, Estopa, Niños Pequeños, Maria, Poporopa, Se Grita, Por Los Mios, Ojos Sin Ver, Desespero, Problemas, Walou bla bla, Un Amigo Me Falló, Tiempo de Nada, Caballero">
+                    data-names="Cristales, Paz, Mi Barrio, No Estuviste En Lo Malo, Andando, Soledad, Estopa, Niños Pequeños, Maria, Poporopa, Se Grita, Por Los Mios, Ojos Sin Ver, Desespero, Problemi, Walou bla bla, Un Amigo Me Falló, Tiempo de Nada, Caballero">
                     Ascolta ora
                 </button>
             </div>
@@ -252,6 +252,176 @@
         <button id="like-button" class="like-button">❤️</button> <!-- Pulsante per i preferiti -->
         <button id="add-to-playlist-button" class="add-to-playlist-button" title="Aggiungi alla mia playlist"><i class="bi bi-plus-circle"></i></button>
         <button id="lyrics-button" class="lyrics-button" title="Visualizza testi"><i class="bi bi-chat-quote"></i></button>
+        <button id="equalizer-button" class="equalizer-button" title="Equalizzatore Audio"><i class="bi bi-sliders"></i></button>
+    </div>
+
+    <!-- Pannello Equalizzatore -->
+    <div id="equalizer-panel" class="equalizer-panel">
+        <div class="eq-header">
+            <h3><i class="bi bi-sliders"></i> Equalizzatore Audio</h3>
+            <div class="eq-header-controls">
+                <select class="preset-selector" id="preset-selector">
+                    <option value="normale">Normale</option>
+                    <option value="rock">Rock</option>
+                    <option value="pop">Pop</option>
+                    <option value="jazz">Jazz</option>
+                    <option value="classica">Classica</option>
+                    <option value="elettronica">Elettronica</option>
+                    <option value="bass-boost">Bass Boost</option>
+                    <option value="vocal">Vocal</option>
+                </select>
+                <button class="eq-close-btn" id="eq-close-btn">×</button>
+            </div>
+        </div>
+        
+        <div class="eq-content">
+            <!-- Sliders delle frequenze -->
+            <div class="frequency-section">
+                <h4>Frequenze</h4>
+                <div class="frequency-sliders">
+                    <div class="freq-slider-group">
+                        <label>60Hz</label>
+                        <input type="range" class="freq-slider" data-frequency="60" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>170Hz</label>
+                        <input type="range" class="freq-slider" data-frequency="170" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>310Hz</label>
+                        <input type="range" class="freq-slider" data-frequency="310" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>600Hz</label>
+                        <input type="range" class="freq-slider" data-frequency="600" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>1kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="1000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>3kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="3000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>6kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="6000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>12kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="12000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>14kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="14000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                    <div class="freq-slider-group">
+                        <label>16kHz</label>
+                        <input type="range" class="freq-slider" data-frequency="16000" min="-20" max="20" value="0" step="0.5">
+                        <span class="freq-value">0dB</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controlli Bass e Treble -->
+            <div class="bass-treble-section">
+                <h4>Bass & Treble</h4>
+                <div class="bass-treble-controls">
+                    <div class="bass-control">
+                        <label for="bass-knob">Bass</label>
+                        <div class="knob-container">
+                            <input type="range" id="bass-knob" class="knob" min="-20" max="20" value="0" step="1">
+                            <span class="knob-value" id="bass-value">0dB</span>
+                        </div>
+                    </div>
+                    <div class="treble-control">
+                        <label for="treble-knob">Treble</label>
+                        <div class="knob-container">
+                            <input type="range" id="treble-knob" class="knob" min="-20" max="20" value="0" step="1">
+                            <span class="knob-value" id="treble-value">0dB</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Effetti Audio -->
+            <div class="effects-section">
+                <h4>Effetti Audio</h4>
+                <div class="effects-controls">
+                    <div class="effect-group">
+                        <div class="effect-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="reverb-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                            <span>Reverb</span>
+                        </div>
+                        <div class="effect-controls" id="reverb-controls">
+                            <select id="reverb-type">
+                                <option value="room">Room</option>
+                                <option value="hall">Hall</option>
+                                <option value="cathedral">Cathedral</option>
+                                <option value="studio">Studio</option>
+                            </select>
+                            <div class="control-group">
+                                <label>Mix</label>
+                                <input type="range" id="reverb-mix" min="0" max="100" value="30" step="1">
+                                <span id="reverb-mix-value">30%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="effect-group">
+                        <div class="effect-toggle">
+                            <label class="switch">
+                                <input type="checkbox" id="echo-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                            <span>Echo</span>
+                        </div>
+                        <div class="effect-controls" id="echo-controls">
+                            <div class="control-group">
+                                <label>Delay</label>
+                                <input type="range" id="echo-delay" min="50" max="1000" value="250" step="10">
+                                <span id="echo-delay-value">250ms</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Feedback</label>
+                                <input type="range" id="echo-feedback" min="0" max="70" value="25" step="1">
+                                <span id="echo-feedback-value">25%</span>
+                            </div>
+                            <div class="control-group">
+                                <label>Mix</label>
+                                <input type="range" id="echo-mix" min="0" max="50" value="20" step="1">
+                                <span id="echo-mix-value">20%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analizzatore di Spettro -->
+            <div class="spectrum-section">
+                <h4>Analizzatore di Spettro</h4>
+                <div class="spectrum-analyzer">
+                    <canvas id="spectrum-canvas" width="300" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="eq-actions">
+            <button class="eq-btn reset-btn" id="eq-reset-btn">Reset</button>
+            <button class="eq-btn save-preset-btn" id="save-preset-btn">Salva Preset</button>
+        </div>
     </div>
 
     <audio id="audio-player" src="" preload="none"></audio>

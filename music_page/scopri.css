@@ -1058,57 +1058,489 @@ button:hover {
     line-height: 1.4;
 }
 
-/* Responsive design per dispositivi mobili - COERENTE */
+/* ========== EQUALIZZATORE AUDIO ========== */
+
+.equalizer-button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.2em;
+    padding: 8px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 50%;
+}
+
+.equalizer-button:hover {
+    color: #00bfff;
+    background: rgba(0, 191, 255, 0.1);
+}
+
+.equalizer-button.active {
+    color: #00bfff;
+    background: rgba(0, 191, 255, 0.2);
+}
+
+.equalizer-panel {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 420px;
+    max-height: 80vh;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 40, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+    border-radius: 15px;
+    transform: translateY(100%) scale(0.8);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 2000;
+    box-shadow: 0 20px 40px rgba(0, 191, 255, 0.1);
+    overflow: hidden;
+}
+
+.equalizer-panel.show {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    visibility: visible;
+}
+
+.eq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: linear-gradient(90deg, rgba(0, 191, 255, 0.1) 0%, rgba(0, 123, 255, 0.1) 100%);
+    border-bottom: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+.eq-header h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.eq-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.preset-selector {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.preset-selector:hover {
+    border-color: #00bfff;
+    background: rgba(0, 191, 255, 0.1);
+}
+
+.preset-selector option {
+    background: #1a1a1a;
+    color: #fff;
+}
+
+.eq-close-btn {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eq-close-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff4757;
+}
+
+.eq-content {
+    padding: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #00bfff rgba(0, 0, 0, 0.3);
+}
+
+.eq-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.eq-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.eq-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00bfff, #007acc);
+    border-radius: 3px;
+}
+
+.frequency-section,
+.bass-treble-section,
+.effects-section,
+.spectrum-section {
+    margin-bottom: 25px;
+}
+
+.frequency-section h4,
+.bass-treble-section h4,
+.effects-section h4,
+.spectrum-section h4 {
+    color: #00bfff;
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sliders delle frequenze */
+.frequency-sliders {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px;
+}
+
+.freq-slider-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.freq-slider-group label {
+    font-size: 0.8em;
+    color: #b3b3b3;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.freq-slider {
+    writing-mode: bt-lr; /* IE */
+    writing-mode: vertical-lr; /* Standard */
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    width: 6px;
+    height: 120px;
+    background: linear-gradient(180deg, #ff4757 0%, #ffa502 25%, #2ed573 50%, #ffa502 75%, #ff4757 100%);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.freq-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #00bfff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
+    border: 2px solid #fff;
+}
+
+.freq-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #00bfff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 0 8px rgba(0, 191, 255, 0.5);
+}
+
+.freq-value {
+    font-size: 0.7em;
+    color: #00bfff;
+    margin-top: 8px;
+    font-weight: 600;
+}
+
+/* Bass e Treble */
+.bass-treble-controls {
+    display: flex;
+    justify-content: space-around;
+    gap: 40px;
+}
+
+.bass-control,
+.treble-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bass-control label,
+.treble-control label {
+    color: #b3b3b3;
+    margin-bottom: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.knob-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.knob {
+    width: 80px;
+    height: 80px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: conic-gradient(from 135deg, #ff4757 0deg, #ffa502 90deg, #2ed573 180deg, #ffa502 270deg, #ff4757 360deg);
+    border-radius: 50%;
+    cursor: pointer;
+    outline: none;
+    position: relative;
+}
+
+.knob::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00bfff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0, 191, 255, 0.7);
+    border: 3px solid #fff;
+}
+
+.knob-value {
+    color: #00bfff;
+    font-size: 0.9em;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Effetti Audio */
+.effects-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.effect-group {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+.effect-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.effect-toggle span {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Switch personalizzato */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 28px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    transition: 0.4s;
+    border-radius: 28px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #00bfff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.effect-controls {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.effect-controls.active {
+    display: flex;
+}
+
+.effect-controls select {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 191, 255, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.control-group label {
+    color: #b3b3b3;
+    font-size: 0.9em;
+    min-width: 60px;
+}
+
+.control-group input[type="range"] {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    outline: none;
+}
+
+.control-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #00bfff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.control-group span {
+    color: #00bfff;
+    font-size: 0.8em;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Analizzatore di Spettro */
+.spectrum-analyzer {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+#spectrum-canvas {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+/* Azioni Equalizzatore */
+.eq-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(0, 191, 255, 0.2);
+}
+
+.eq-btn {
+    background: linear-gradient(135deg, #00bfff, #007acc);
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.eq-btn:hover {
+    background: linear-gradient(135deg, #007acc, #0056b3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 191, 255, 0.3);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #ff4757, #ff3742);
+}
+
+.reset-btn:hover {
+    background: linear-gradient(135deg, #ff3742, #ff1e30);
+}
+
+/* Responsive per mobile */
 @media (max-width: 768px) {
-    .lyrics-overlay-content {
-        width: 95%;
-        max-height: 90vh;
-        margin: 20px;
+    .equalizer-panel {
+        width: 95vw;
+        right: 2.5vw;
+        max-height: 70vh;
     }
     
-    .lyrics-header {
-        padding: 15px 20px;
-        border-radius: 15px 15px 0 0;
+    .frequency-sliders {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
     }
     
-    .lyrics-header h2 {
-        font-size: 1.3em;
+    .freq-slider {
+        height: 80px;
     }
     
-    .lyrics-close-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 16px;
+    .bass-treble-controls {
+        gap: 20px;
     }
     
-    .lyrics-container {
-        padding: 20px;
-        max-height: 350px;
-    }
-    
-    .lyrics-content {
-        font-size: 1.1rem;
-        line-height: 2.2;
-    }
-    
-    .lyric-line {
-        margin: 10px 0;
-        padding: 10px 15px;
-        font-size: 1rem;
-    }
-    
-    .lyric-line.highlight {
-        font-size: 1.2rem;
-    }
-    
-    .lyrics-controls {
-        margin: 0 15px 15px 15px;
-        padding: 12px 15px;
-        font-size: 0.85rem;
-    }
-    
-    .lyrics-controls small {
-        font-size: 0.75rem;
-        line-height: 1.3;
+    .knob {
+        width: 60px;
+        height: 60px;
     }
 }
